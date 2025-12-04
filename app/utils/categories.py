@@ -20,8 +20,8 @@ CATEGORY_CONFIG = {
     },
     "bakeries": {
         "keywords": ["slastičar", "slasticar", "bakery", "pastry", "kolač", "kolac", "torta", "sladoled", "slastice", "dessert", "sweets", "cake", "cakes", "pastries"],
-        "query": "best bakeries pastry shops",
-        "label": "bakeries",
+        "query": "slastičarna pastry shop cake",
+        "label": "bakeries & pastry shops",
         "card_type": "restaurant",
     },
     "nightlife": {
@@ -171,10 +171,28 @@ def extract_city_from_message(message: str) -> Optional[str]:
     """Extract city name from user message."""
     msg = (message or "").lower()
     
-    # First try to find a known Croatian city
+    # Normalization map for Croatian declensions (lokativ -> nominativ)
+    CITY_NORMALIZATION = {
+        "opatiji": "opatija", "zagrebu": "zagreb", "rijeci": "rijeka", "splitu": "split",
+        "dubrovniku": "dubrovnik", "puli": "pula", "zadru": "zadar", "šibeniku": "šibenik",
+        "osijeku": "osijek", "karlovcu": "karlovac", "varaždinu": "varaždin", "rovinju": "rovinj",
+        "poreču": "poreč", "makarskoj": "makarska", "trogiru": "trogir", "hvaru": "hvar",
+        "korčuli": "korčula", "krku": "krk", "rabu": "rab", "pagu": "pag", "cresu": "cres",
+        "lovranu": "lovran", "mošćeničkoj dragi": "mošćenička draga", "medulinu": "medulin",
+        "omišlju": "omišalj", "malinski": "malinska", "baškoj": "baška", "vodicama": "vodice",
+        "novalji": "novalja", "biogradu": "biograd", "ninu": "nin", "solinu": "solin",
+        "sinju": "sinj", "vukovaru": "vukovar", "vinkovcima": "vinkovci", "kninu": "knin",
+    }
+    
+    # First try to find a known Croatian city (with normalization)
     for city in CROATIAN_CITIES:
         if city.lower() in msg:
             return city.title()
+    
+    # Check for declensions
+    for declension, nominativ in CITY_NORMALIZATION.items():
+        if declension in msg:
+            return nominativ.title()
     
     # Try regex patterns
     for pattern in LOCATION_QUERY_PATTERNS:
@@ -182,7 +200,12 @@ def extract_city_from_message(message: str) -> Optional[str]:
         if match:
             potential_city = match.group(1).strip()
             # Clean up the city name
-            potential_city = re.sub(r"[^\w\s]", "", potential_city).strip()
+            potential_city = re.sub(r"[^\w\s]", "", potential_city).strip().lower()
+            
+            # Check if it's a known declension
+            if potential_city in CITY_NORMALIZATION:
+                return CITY_NORMALIZATION[potential_city].title()
+            
             if potential_city and len(potential_city) > 2:
                 return potential_city.title()
     
