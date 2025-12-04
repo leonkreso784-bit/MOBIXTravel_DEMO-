@@ -127,6 +127,9 @@ class OpenAIClient:
         self.project = os.getenv("OPENAI_PROJECT")
         self.organization = os.getenv("OPENAI_ORG")
         self.endpoint = "https://api.openai.com/v1/chat/completions"
+        
+        # Debug log
+        print(f"[OPENAI INIT] API Key present: {bool(self.api_key)}, Model: {self.model}, Enabled: {self.enabled}")
 
     def _build_headers(self) -> Dict[str, str]:
         headers = {
@@ -146,37 +149,20 @@ class OpenAIClient:
             f"🌍 MOBIX TRAVEL ASSISTANT\n"
             f"========================\n\n"
             f"⚠️ CRITICAL: Respond ONLY in {lang_name.upper()} ({lang_code.upper()})!\n\n"
-            f"You are MOBIX Travel, a friendly and knowledgeable travel assistant.\n\n"
-            f"INTENT HANDLING:\n"
+            f"You are MOBIX Travel, a friendly and knowledgeable travel assistant chatbot.\n\n"
+            f"WHAT YOU CAN DO:\n"
             f"----------------\n"
-            f"1. GREETING → Generate a warm, personalized welcome. Introduce yourself briefly, "
-            f"mention 2-3 specific things you can help with (trip planning, finding hotels/restaurants, "
-            f"destination advice). End with an open question. Use 1-2 emojis. Keep it 3-4 sentences.\n\n"
-            f"2. QUESTION_ONLY → Light conversation or factual Q&A. Give concise, helpful responses. "
-            f"Optionally mention you can create a full travel plan if relevant.\n\n"
-            f"3. TRAVEL_ADVICE → User wants destination RECOMMENDATIONS (where to go). "
-            f"Suggest 2-3 specific destinations with:\n"
-            f"   • Why it's perfect for them\n"
-            f"   • Top 3-5 NAMED attractions\n"
-            f"   • Best time to visit (specific months)\n"
-            f"   • Budget estimate (€ range)\n"
-            f"   • Insider tips\n"
-            f"   DO NOT include transport/booking details - just recommendations!\n\n"
-            f"4. PLAN_REQUEST → Full travel itinerary. Write engaging WHY explanations for:\n"
-            f"   • Transport options (flights, trains, buses, driving)\n"
-            f"   • Hotels (why each is recommended)\n"
-            f"   • Restaurants (cuisine, atmosphere, location)\n"
-            f"   • Activities (why they're worth visiting)\n"
-            f"   Backend adds structured CARD blocks - you write the narrative!\n\n"
-            f"5. SPECIFIC_SEARCH → Category search (restaurants, hotels, etc.). Write 2-3 sentences "
-            f"WHY each place is recommended. Backend adds structured data after.\n\n"
-            f"CRITICAL RULES:\n"
-            f"--------------\n"
-            f"• Use ONLY data from TRAVEL_DATA if provided - never invent flight numbers or prices\n"
+            f"• Have normal conversations (greetings, who are you, how are you, etc.)\n"
+            f"• Give travel advice and destination recommendations\n"
+            f"• Answer questions about travel, visas, weather, costs\n"
+            f"• Help plan trips with itineraries\n\n"
+            f"RULES:\n"
+            f"------\n"
+            f"• Be friendly, helpful, and conversational\n"
+            f"• Use 1-2 emojis per message for warmth\n"
+            f"• Keep responses concise (3-6 sentences) unless more detail is needed\n"
             f"• NEVER generate [CARD] blocks - backend adds them automatically\n"
-            f"• NEVER generate markdown links [text](url) - backend adds all links\n"
-            f"• If no data available, say so politely in user's language\n"
-            f"• Be helpful, friendly, and specific - avoid generic phrases\n"
+            f"• If asked inappropriate questions, politely redirect to travel topics\n"
             f"• Every word must be in {lang_name.upper()} language!"
         )
 
@@ -207,6 +193,7 @@ class OpenAIClient:
         }
 
         if not self.enabled:
+            print(f"[OPENAI DEBUG] API disabled - no API key found!")
             return self._fallback_chat(messages, language_tag, language_code)
 
         try:
@@ -215,7 +202,11 @@ class OpenAIClient:
                 response.raise_for_status()
                 data = response.json()
                 return data["choices"][0]["message"]["content"].strip()
-        except httpx.HTTPError:
+        except httpx.HTTPError as e:
+            print(f"[OPENAI DEBUG] HTTP Error: {e}")
+            return self._fallback_chat(messages, language_tag, language_code)
+        except Exception as e:
+            print(f"[OPENAI DEBUG] Unexpected error: {e}")
             return self._fallback_chat(messages, language_tag, language_code)
 
     async def classify_intent(
