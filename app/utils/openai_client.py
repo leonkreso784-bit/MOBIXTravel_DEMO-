@@ -119,7 +119,8 @@ class OpenAIClient:
     """Lightweight OpenAI Chat Completions wrapper with shared system prompt."""
 
     def __init__(self) -> None:
-        self.api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        # Support both OPENAI_API_KEY and PENAI_API_KEY (typo on Railway)
+        self.api_key = (os.getenv("OPENAI_API_KEY") or os.getenv("PENAI_API_KEY") or "").strip()
         self.enabled = bool(self.api_key)
         self.model = (os.getenv("OPENAI_MODEL") or "gpt-4o").strip()
         if not self.model:
