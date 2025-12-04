@@ -13,8 +13,7 @@ window.MOBIX = window.MOBIX || {};
         window.MOBIX.API_BASE = 'http://127.0.0.1:8005';
     } else {
         // PRODUKCIJA: Railway backend URL
-        // ZAMIJENI OVO sa pravim Railway URL-om nakon deploya!
-        window.MOBIX.API_BASE = 'https://mobix-production.up.railway.app';
+        window.MOBIX.API_BASE = 'https://web-production-7d58.up.railway.app';
     }
     
     // Backward compatibility
