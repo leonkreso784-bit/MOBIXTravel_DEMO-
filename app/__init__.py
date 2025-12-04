@@ -47,6 +47,23 @@ app.add_middleware(
 	allow_credentials=True,
 )
 
+@app.get("/api/debug/env")
+async def debug_env():
+	"""Debug endpoint to check environment variables."""
+	api_key = os.getenv("OPENAI_API_KEY", "")
+	google_key = os.getenv("GOOGLE_API_KEY", "")
+	return {
+		"openai_key_exists": bool(api_key),
+		"openai_key_first_20": api_key[:20] if api_key else "N/A",
+		"openai_key_length": len(api_key) if api_key else 0,
+		"google_key_exists": bool(google_key),
+		"model": os.getenv("OPENAI_MODEL", "not set"),
+	}
+
+@app.get("/api")
+async def api_info():
+	return {"status": "ok", "service": "MOBIX Travel"}
+
 app.include_router(chat_router)
 app.include_router(plan_router)
 app.include_router(places_router)
@@ -89,23 +106,6 @@ async def favicon():
         return FileResponse(favicon_path)
     # Return empty response if no favicon
     return FileResponse(Path(__file__).parent.parent / "ui" / "assets" / "favicon.ico", status_code=204)
-
-
-@app.get("/api")
-async def api_info():
-	return {"status": "ok", "service": "MOBIX Travel"}
-
-
-@app.get("/api/debug/env")
-async def debug_env():
-	"""Debug endpoint to check environment variables."""
-	api_key = os.getenv("OPENAI_API_KEY", "")
-	return {
-		"api_key_exists": bool(api_key),
-		"api_key_first_20": api_key[:20] if api_key else "N/A",
-		"api_key_length": len(api_key) if api_key else 0,
-		"env_path": str(Path(__file__).parent.parent / ".env"),
-	}
 
 
 __all__ = ["app"]
