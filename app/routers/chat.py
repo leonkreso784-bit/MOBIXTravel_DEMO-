@@ -329,11 +329,19 @@ async def chat(
     if not profile:
         profile = dict(session_memory.get("profile") or {})
 
-    # Fast greeting response without GPT (instant reply)
+    # Import small talk detection
+    from ..utils.intent import is_small_talk
+    from ..utils.language import get_small_talk_text
+    
+    # Fast greeting/small talk response without GPT (instant reply)
     if is_greeting(message):
-        greeting_reply = get_greeting_text(language_code)
-        append_history(session_id, message, greeting_reply)
-        return {"reply": greeting_reply, "intent": "GREETING"}
+        # Check if it's small talk (how are you, what's up, etc.) vs simple greeting
+        if is_small_talk(message):
+            reply = get_small_talk_text(language_code)
+        else:
+            reply = get_greeting_text(language_code)
+        append_history(session_id, message, reply)
+        return {"reply": reply, "intent": "GREETING"}
     
     # PROFILE_QUESTION - User asking about their profile (no CARD blocks)
     from ..utils.intent import is_profile_question

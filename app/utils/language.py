@@ -8,6 +8,7 @@ LANGUAGE_METADATA = {
     "hr": {
         "tag": "CROATIAN (HR)",
         "greeting": "Bok! 👋 Ja sam tvoj MOBIX asistent. Reci mi trebaš li plan putovanja, savjet ili samo ideje?",
+        "small_talk": "Odlično sam, hvala što pitaš! 😊 Ja sam MOBIX, tvoj asistent za putovanja. Kako ti mogu pomoći danas? Trebaš plan puta, savjete za destinaciju ili nešto drugo?",
         "plan_invite": "💡 Želiš li da ti ovo pretvorim u strukturirani plan putovanja koji možeš spremiti u tvoj MOBIX Travel Planner?",
         "keywords": ["bok", "pozdrav", "putova", "želim", "molim", "hrvats", "treba", "rijeka", "zagreb"],
         # Strong Croatian-only markers for short phrases
@@ -16,6 +17,7 @@ LANGUAGE_METADATA = {
     "sl": {
         "tag": "SLOVENIAN (SL)",
         "greeting": "Živjo! 👋 Tukaj MOBIX. Naj ti pripravim potovalni nasvet ali načrt?",
+        "small_talk": "Super sem, hvala za vprašanje! 😊 Sem MOBIX, tvoj potovalni asistent. Kako ti lahko pomagam danes? Rabiš načrt poti, nasvete za destinacijo ali kaj drugega?",
         "plan_invite": "💡 Želiš, da ti to pretvorim v strukturiran potovalni načrt, ki ga lahko shraniš v svoj MOBIX Travel Planner?",
         "keywords": ["živjo", "potujem", "sloven", "rabim načrt"],
         # Strong Slovenian-only markers for short phrases
@@ -24,36 +26,42 @@ LANGUAGE_METADATA = {
     "de": {
         "tag": "GERMAN (DE)",
         "greeting": "Hallo! 👋 Ich bin dein MOBIX Reiseassistent. Brauchst du Ideen, Tipps oder einen Reiseplan?",
+        "small_talk": "Mir geht's prima, danke der Nachfrage! 😊 Ich bin MOBIX, dein Reiseassistent. Wie kann ich dir heute helfen? Brauchst du einen Reiseplan, Tipps für ein Ziel oder etwas anderes?",
         "plan_invite": "💡 Soll ich dir das in einen strukturierten Reiseplan umwandeln, den du in deinem MOBIX Travel Planner speichern kannst?",
         "keywords": ["hallo", "reise", "brauche", "flug", "günstig"],
     },
     "it": {
         "tag": "ITALIAN (IT)",
         "greeting": "Ciao! 👋 Sono il tuo assistente di viaggio MOBIX. Vuoi idee, consigli o un piano completo?",
+        "small_talk": "Sto benissimo, grazie per avermelo chiesto! 😊 Sono MOBIX, il tuo assistente di viaggio. Come posso aiutarti oggi? Hai bisogno di un piano di viaggio, consigli per una destinazione o qualcos'altro?",
         "plan_invite": "💡 Vuoi che trasformi questo in un piano di viaggio strutturato che puoi salvare nel tuo MOBIX Travel Planner?",
         "keywords": ["ciao", "viaggio", "piano", "consiglio", "ital"],
     },
     "es": {
         "tag": "SPANISH (ES)",
         "greeting": "¡Hola! 👋 Soy tu asistente MOBIX. ¿Quieres un plan, un consejo o unas ideas?",
+        "small_talk": "¡Estoy genial, gracias por preguntar! 😊 Soy MOBIX, tu asistente de viajes. ¿Cómo puedo ayudarte hoy? ¿Necesitas un plan de viaje, consejos para un destino o algo más?",
         "plan_invite": "💡 ¿Quieres que convierta esto en un plan de viaje estructurado que puedas guardar en tu MOBIX Travel Planner?",
         "keywords": ["hola", "viaje", "plan", "consejo", "espa"],
     },
     "fr": {
         "tag": "FRENCH (FR)",
         "greeting": "Salut! 👋 Ici MOBIX. Tu veux des idées voyage, des conseils ou un plan détaillé?",
+        "small_talk": "Je vais très bien, merci de demander! 😊 Je suis MOBIX, ton assistant de voyage. Comment puis-je t'aider aujourd'hui? Tu as besoin d'un plan de voyage, de conseils pour une destination ou autre chose?",
         "plan_invite": "💡 Veux-tu que je transforme cela en un plan de voyage structuré que tu peux enregistrer dans ton MOBIX Travel Planner ?",
         "keywords": ["bonjour", "salut", "voyage", "itineraire", "fran"],
     },
     "uk": {
         "tag": "UKRAINIAN (UK)",
         "greeting": "Привіт! 👋 Я твій асистент MOBIX. Хочеш повний маршрут, пораду чи просто ідеї?",
+        "small_talk": "Все чудово, дякую що питаєш! 😊 Я MOBIX, твій асистент для подорожей. Як я можу допомогти тобі сьогодні? Потрібен план подорожі, поради щодо напрямку чи щось інше?",
         "plan_invite": "💡 Хочеш, щоб я перетворив це на структурований маршрут для твого MOBIX Travel Planner?",
         "keywords": ["привіт", "привітання", "маршрут", "подорож"],
     },
     "en": {
         "tag": "ENGLISH (EN)",
         "greeting": "Hi! 👋 I'm your MOBIX assistant. Do you want a travel plan, a tip, or just ideas?",
+        "small_talk": "I'm doing great, thanks for asking! 😊 I'm MOBIX, your travel assistant. How can I help you today? Do you need a travel plan, destination tips, or something else?",
         "plan_invite": "💡 Do you want me to turn this into a structured travel plan you can save to your MOBIX Travel Planner?",
         "keywords": ["hello", "hi", "trip", "travel", "plan"],
         # Strong English-only markers for short phrases
@@ -199,6 +207,51 @@ def detect_language(message: str, preferred_code: Optional[str] = None) -> Tuple
         meta = _metadata("en")
         return meta["tag"], "en"
     
+    # PRIORITY 0.5: Detect German, French, Spanish, Italian BEFORE langdetect can misclassify
+    german_signals = ("wie", "was", "wer", "ist", "bist", "hast", "kannst", "guten", "tag", "morgen", "abend", "danke", "bitte", "ich", "du", "sie", "schön", "schon", "nach", "von", "für", "auf", "mit")
+    french_signals = ("comment", "ça", "ca", "est", "est-ce", "que", "qui", "quoi", "où", "ou", "merci", "bonjour", "bonsoir", "salut", "je", "tu", "nous", "vous", "très", "tres", "bien", "mal", "oui", "non", "avec", "pour", "dans")
+    spanish_signals = ("cómo", "como", "qué", "que", "quién", "quien", "dónde", "donde", "gracias", "hola", "buenos", "buenas", "yo", "tú", "tu", "usted", "muy", "bien", "mal", "sí", "si", "no", "con", "para", "en")
+    italian_signals = ("come", "cosa", "chi", "dove", "quando", "grazie", "ciao", "buon", "buona", "io", "tu", "lei", "molto", "bene", "male", "sì", "si", "no", "con", "per", "in")
+    
+    words_set = set(lowered.split())
+    german_count = sum(1 for w in words_set if w in german_signals)
+    french_count = sum(1 for w in words_set if w in french_signals)
+    spanish_count = sum(1 for w in words_set if w in spanish_signals)
+    italian_count = sum(1 for w in words_set if w in italian_signals)
+    
+    # If 2+ words match a language, detect it
+    if german_count >= 2:
+        meta = _metadata("de")
+        return meta["tag"], "de"
+    if french_count >= 2:
+        meta = _metadata("fr")
+        return meta["tag"], "fr"
+    if spanish_count >= 2:
+        meta = _metadata("es")
+        return meta["tag"], "es"
+    if italian_count >= 2:
+        meta = _metadata("it")
+        return meta["tag"], "it"
+    
+    # Single-word detection for greetings
+    german_greetings = {"hallo", "guten", "tag", "morgen", "abend", "servus", "danke"}
+    french_greetings = {"bonjour", "bonsoir", "salut", "merci"}
+    spanish_greetings = {"hola", "gracias", "buenos", "buenas"}
+    italian_greetings = {"ciao", "buongiorno", "buonasera", "grazie", "salve"}
+    
+    if words_set & german_greetings:
+        meta = _metadata("de")
+        return meta["tag"], "de"
+    if words_set & french_greetings:
+        meta = _metadata("fr")
+        return meta["tag"], "fr"
+    if words_set & spanish_greetings:
+        meta = _metadata("es")
+        return meta["tag"], "es"
+    if words_set & italian_greetings:
+        meta = _metadata("it")
+        return meta["tag"], "it"
+    
     # PRIORITY 1: Check strong markers FIRST (for short phrases like "Kako si?", "Tko si ti?")
     for code, data in LANGUAGE_METADATA.items():
         strong_markers = data.get("strong_markers", [])
@@ -279,6 +332,12 @@ def get_greeting_text(language_code: str) -> str:
     return meta["greeting"]
 
 
+def get_small_talk_text(language_code: str) -> str:
+    """Get small talk response for the given language (e.g., reply to 'how are you')."""
+    meta = _metadata(_normalize_code(language_code))
+    return meta.get("small_talk", meta["greeting"])
+
+
 def get_plan_invite(language_code: str) -> str:
     meta = _metadata(_normalize_code(language_code))
     return meta["plan_invite"]
@@ -287,6 +346,7 @@ def get_plan_invite(language_code: str) -> str:
 __all__ = [
     "detect_language",
     "get_greeting_text",
+    "get_small_talk_text",
     "get_plan_invite",
     "LANGUAGE_METADATA",
 ]

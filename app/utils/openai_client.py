@@ -14,7 +14,7 @@ try:
 except ImportError:  # pragma: no cover
     ultimate_detect = None  # type: ignore
 
-from .language import get_greeting_text
+from .language import get_greeting_text, get_small_talk_text
 
 GREETING_TOKENS = {
     "hi",
@@ -93,10 +93,32 @@ ROUTE_HINT_TOKENS = (
     "→",
 )
 
+# Small talk phrases that should be treated as greetings
+SMALL_TALK_TOKENS = {
+    "how are you", "how r u", "how's it going", "what's up", "whats up",
+    "what are you doing", "who are you", "what is your name", "what's your name",
+    "kako si", "kako ste", "što ima", "šta ima", "sta ima", "sto ima",
+    "tko si", "ko si", "tko si ti", "ko si ti",
+    "wie geht es dir", "wie gehts", "wie geht's", "was machst du",
+    "cómo estás", "como estas", "qué tal", "que tal",
+    "comment ça va", "comment ca va", "ça va", "ca va",
+    "come stai", "come va", "che fai", "cosa fai",
+}
+
 
 def _looks_like_greeting(message: str) -> bool:
     text = (message or "").strip().lower()
-    return text in GREETING_TOKENS
+    # Check exact greeting tokens
+    if text in GREETING_TOKENS:
+        return True
+    # Check small talk phrases
+    if text in SMALL_TALK_TOKENS:
+        return True
+    # Check if small talk phrase is contained
+    for phrase in SMALL_TALK_TOKENS:
+        if phrase in text:
+            return True
+    return False
 
 
 def _has_route_hint(text: str) -> bool:
@@ -582,6 +604,13 @@ class OpenAIClient:
     def _question_summary(self, language_code: str, user_text: str) -> str:
         cleaned = (user_text or "").strip()
         lang_code = language_code or "en"
+        
+        # Check for small talk first (how are you, what's up, etc.)
+        cleaned_lower = cleaned.lower()
+        if cleaned_lower in SMALL_TALK_TOKENS or any(phrase in cleaned_lower for phrase in SMALL_TALK_TOKENS):
+            return get_small_talk_text(lang_code)
+        
+        # Check for simple greeting
         if _looks_like_greeting(cleaned):
             return get_greeting_text(lang_code)
         if not cleaned:

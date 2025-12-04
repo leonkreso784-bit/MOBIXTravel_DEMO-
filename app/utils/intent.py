@@ -31,6 +31,37 @@ GREETING_PHRASES = {
     "привіт", "привітання", "вітаю", "доброго дня", "добрий день",
 }
 
+# Small talk phrases (casual conversation, not travel-related)
+SMALL_TALK_PHRASES = {
+    # English
+    "how are you", "how r u", "how's it going", "what's up", "whats up",
+    "what are you doing", "who are you", "what is your name", "what's your name",
+    "nice to meet you", "pleased to meet you", "how do you do",
+    "good to see you", "long time no see", "thank you", "thanks",
+    "bye", "goodbye", "see you", "see ya", "take care", "have a nice day",
+    # Croatian
+    "kako si", "kako ste", "što ima", "šta ima", "sta ima", "sto ima",
+    "tko si", "ko si", "tko si ti", "ko si ti", "kako se zoveš", "kako se zoves",
+    "drago mi je", "hvala", "hvala ti", "hvala vam", "fala",
+    "doviđenja", "dovidenja", "bok", "ćao", "vidimo se", "čujemo se",
+    # German
+    "wie geht es dir", "wie gehts", "wie geht's", "was machst du",
+    "wer bist du", "wie heißt du", "wie heisst du", "freut mich",
+    "danke", "danke schön", "tschüss", "tschuss", "auf wiedersehen",
+    # Spanish
+    "cómo estás", "como estas", "qué tal", "que tal", "qué haces", "que haces",
+    "quién eres", "quien eres", "cómo te llamas", "como te llamas",
+    "mucho gusto", "gracias", "adiós", "adios", "hasta luego",
+    # French
+    "comment ça va", "comment ca va", "ça va", "ca va", "quoi de neuf",
+    "qui es-tu", "qui es tu", "comment tu t'appelles", "enchanté", "enchante",
+    "merci", "au revoir", "à bientôt", "a bientot",
+    # Italian
+    "come stai", "come va", "che fai", "cosa fai",
+    "chi sei", "come ti chiami", "piacere",
+    "grazie", "arrivederci", "a presto",
+}
+
 TRAVEL_KEYWORDS = {
     "putovanje",
     "put",
@@ -259,14 +290,36 @@ ROUTE_HINT_TOKENS = (
 )
 
 
-def is_greeting(message: str) -> bool:
-    """Check if message is a greeting. Strips punctuation and checks normalized lowercase."""
+def is_small_talk(message: str) -> bool:
+    """Check if message is casual small talk (how are you, what's up, etc.)."""
     text = (message or "").strip().lower()
     # Remove common punctuation
     text = text.rstrip("!?.,:;")
     
-    # Check exact match first
+    # Check exact match
+    if text in SMALL_TALK_PHRASES:
+        return True
+    
+    # Check if any small talk phrase is contained in the message
+    for phrase in SMALL_TALK_PHRASES:
+        if phrase in text:
+            return True
+    
+    return False
+
+
+def is_greeting(message: str) -> bool:
+    """Check if message is a greeting or small talk. Strips punctuation and checks normalized lowercase."""
+    text = (message or "").strip().lower()
+    # Remove common punctuation
+    text = text.rstrip("!?.,:;")
+    
+    # Check exact match for greetings first
     if text in GREETING_PHRASES:
+        return True
+    
+    # Check small talk phrases (how are you, what's up, etc.)
+    if is_small_talk(text):
         return True
     
     # Check if message is ONLY a greeting (no other words)
@@ -287,9 +340,21 @@ def is_greeting(message: str) -> bool:
         if phrase_clean in GREETING_PHRASES:
             return True
     
+    # Check 3-word phrases like "how are you", "what's going on"
+    if len(words) == 3:
+        phrase = " ".join(words)
+        if phrase in SMALL_TALK_PHRASES or phrase in GREETING_PHRASES:
+            return True
+    
+    # Check 4-word phrases like "nice to meet you", "how do you do"
+    if len(words) == 4:
+        phrase = " ".join(words)
+        if phrase in SMALL_TALK_PHRASES or phrase in GREETING_PHRASES:
+            return True
+    
     # IMPORTANT: If message starts with greeting BUT contains travel keywords, it's NOT just a greeting
     # Example: "Pozdrav treba mi plan putovanja..." → NOT a greeting (it's a travel request)
-    if len(words) > 3:
+    if len(words) > 4:
         first_word = words[0].rstrip("!?.,:;")
         if first_word in GREETING_PHRASES:
             # Check if rest of message contains travel keywords
