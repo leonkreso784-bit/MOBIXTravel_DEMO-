@@ -22,11 +22,14 @@ from . import models
 # Create all database tables
 models.Base.metadata.create_all(bind=engine)
 
-# Load .env from project root
+# Load .env from project root (for local development only)
+# On Railway/production, env vars are set directly in the environment
 env_path = Path(__file__).parent.parent / ".env"
-print(f"[MOBIX] Looking for .env at: {env_path}")
-print(f"[MOBIX] .env exists: {env_path.exists()}")
-load_dotenv(dotenv_path=env_path, override=True)
+if env_path.exists():
+    print(f"[MOBIX] Loading .env from: {env_path}")
+    load_dotenv(dotenv_path=env_path, override=False)  # Don't override existing env vars
+else:
+    print(f"[MOBIX] No .env file found (using system environment variables)")
 
 # Debug: Print first 20 chars of API key on startup
 api_key = os.getenv("OPENAI_API_KEY", "")

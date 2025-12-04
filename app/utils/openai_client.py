@@ -6,8 +6,12 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 from dotenv import load_dotenv
 
-# Load .env BEFORE reading environment variables
-load_dotenv()
+# Load .env only if it exists (for local development)
+# On Railway/production, env vars are set directly
+from pathlib import Path
+env_path = Path(__file__).parent.parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path, override=False)
 
 try:
     from .ultimate_detector import ultimate_detect
