@@ -329,19 +329,38 @@ async def chat(
     if not profile:
         profile = dict(session_memory.get("profile") or {})
 
-    # Import small talk detection
-    from ..utils.intent import is_small_talk
-    from ..utils.language import get_small_talk_text
-    
-    # Fast greeting/small talk response without GPT (instant reply)
+    # Greeting handling via OpenAI for dynamic, personalized responses
+    # OpenAI generates unique greetings each time instead of hardcoded text
     if is_greeting(message):
-        # Check if it's small talk (how are you, what's up, etc.) vs simple greeting
-        if is_small_talk(message):
-            reply = get_small_talk_text(language_code)
-        else:
-            reply = get_greeting_text(language_code)
-        append_history(session_id, message, reply)
-        return {"reply": reply, "intent": "GREETING"}
+        greeting_messages: List[Dict[str, str]] = [
+            {
+                "role": "system",
+                "content": (
+                    f"You are MOBIX Travel, a friendly multilingual travel assistant. "
+                    f"RESPOND IN {language_tag} ONLY!\n\n"
+                    f"The user just greeted you. Generate a WARM, UNIQUE greeting that:\n"
+                    f"1. Greets them naturally in their language (Croatian: 'Bok!', 'Pozdrav!', English: 'Hello!', 'Hi there!')\n"
+                    f"2. Briefly introduce yourself as MOBIX Travel assistant (1 sentence)\n"
+                    f"3. Mention 2-3 SPECIFIC things you can help with using CONCRETE examples:\n"
+                    f"   - Planning trips (e.g., 'Zagreb → Barcelona')\n"
+                    f"   - Finding hotels, restaurants, activities in cities\n"
+                    f"   - Travel advice and destination recommendations\n"
+                    f"4. End with an open question like 'What can I help you with today?' / 'Što te zanima?'\n\n"
+                    f"RULES:\n"
+                    f"- Keep it 3-4 sentences max\n"
+                    f"- Be friendly but professional\n"
+                    f"- NEVER repeat the same greeting twice - vary examples each time\n"
+                    f"- Use 1-2 emojis for warmth (👋, ✈️, 🌍)"
+                ),
+            }
+        ]
+        if profile:
+            greeting_messages.append({"role": "system", "content": f"USER_PROFILE: {json.dumps(profile, ensure_ascii=False)}"})
+        greeting_messages.append({"role": "user", "content": message})
+        
+        greeting_reply = await openai_client.chat(greeting_messages, language_tag, language_code, max_tokens=400)
+        append_history(session_id, message, greeting_reply)
+        return {"reply": greeting_reply, "intent": "GREETING"}
     
     # PROFILE_QUESTION - User asking about their profile (no CARD blocks)
     from ..utils.intent import is_profile_question
