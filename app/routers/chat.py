@@ -22,6 +22,8 @@ from ..utils.categories import (
     get_category_query,
     get_category_label,
     get_category_card_type,
+    is_location_query,
+    extract_city_from_message,
 )
 from ..utils.travel_bundle import build_travel_bundle, build_return_bundle, serialize_bundle, cards_from_bundle
 from ..utils.formatters import format_specific_search_response, format_travel_plan
@@ -375,6 +377,71 @@ async def chat(
     
     # CHAT - Normal conversation, questions, recommendations, advice - GPT handles everything
     if intent_type == "CHAT":
+        # Check if user is asking about places/locations - use Google Places API!
+        if is_location_query(message):
+            print(f"[MOBIX DEBUG] Detected location query, searching Google Places...")
+            city = extract_city_from_message(message)
+            
+            # Also check session memory for city context
+            if not city and session_memory:
+                city = session_memory.get("last_destination") or session_memory.get("last_origin")
+            
+            if city:
+                category = detect_category(message)
+                search_query = get_category_query(category)
+                label = get_category_label(category)
+                
+                print(f"[MOBIX DEBUG] Searching Google Places: '{search_query}' in '{city}' (category: {category})")
+                
+                # Search Google Places
+                places = await search_places(search_query, city, limit=5, language_code=language_code)
+                
+                if places and len(places) > 0:
+                    # Build context with real Google Places data
+                    places_info = []
+                    for p in places[:5]:
+                        info = f"- {p.get('name')}"
+                        if p.get('rating'):
+                            info += f" ({p.get('rating')}⭐)"
+                        if p.get('address'):
+                            info += f" - {p.get('address')}"
+                        if p.get('maps_url'):
+                            info += f" [Google Maps: {p.get('maps_url')}]"
+                        places_info.append(info)
+                    
+                    places_context = "\n".join(places_info)
+                    
+                    chat_messages: List[Dict[str, str]] = [
+                        {
+                            "role": "system",
+                            "content": (
+                                f"You are MOBIX, a friendly and intelligent travel assistant chatbot. "
+                                f"RESPOND ONLY IN {language_tag}!\n\n"
+                                f"The user asked about {label} in {city}. I searched Google Places and found these REAL places:\n\n"
+                                f"{places_context}\n\n"
+                                f"RULES:\n"
+                                f"- Present these REAL places from Google in a friendly, conversational way\n"
+                                f"- DO NOT invent or add other places - only mention these verified ones\n"
+                                f"- Include ratings when available\n"
+                                f"- You can add brief descriptions but keep facts accurate\n"
+                                f"- Use 1-2 emojis per message\n"
+                                f"- Keep responses concise (3-5 sentences)\n"
+                            ),
+                        }
+                    ]
+                    
+                    chat_messages.extend(history[-4:])
+                    chat_messages.append({"role": "user", "content": message})
+                    
+                    ai_reply = await openai_client.chat(chat_messages, language_tag, language_code, max_tokens=800)
+                    append_history(session_id, message, ai_reply)
+                    return {"reply": ai_reply, "intent": "CHAT", "places": places, "city": city, "category": category}
+                else:
+                    print(f"[MOBIX DEBUG] No places found for '{search_query}' in '{city}'")
+            else:
+                print(f"[MOBIX DEBUG] Could not extract city from message")
+        
+        # Regular CHAT without location query - standard GPT response
         chat_messages: List[Dict[str, str]] = [
             {
                 "role": "system",
@@ -392,6 +459,7 @@ async def chat(
                     f"- Keep responses concise (3-6 sentences)\n"
                     f"- If user asks about trips, ask them for departure and destination cities\n"
                     f"- NEVER generate [CARD] blocks - that's only for PLAN_REQUEST\n"
+                    f"- If user asks about specific places (restaurants, cafes, etc), ask which city they want\n"
                     f"- If inappropriate content, politely redirect to travel topics"
                 ),
             }

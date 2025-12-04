@@ -1,14 +1,27 @@
 import os
-from typing import List, Dict, Optional
+import re
+from typing import List, Dict, Optional, Tuple
 from urllib.parse import quote_plus
 
 import httpx
 
 CATEGORY_CONFIG = {
     "restaurants": {
-        "keywords": ["restaurant", "restoran", "eat", "dining", "food", "bistro"],
+        "keywords": ["restaurant", "restoran", "eat", "dining", "food", "bistro", "jesti", "hrana", "ručak", "večera"],
         "query": "best restaurants",
         "label": "restaurants",
+        "card_type": "restaurant",
+    },
+    "pizzerias": {
+        "keywords": ["pizza", "pizzer", "pizzeria", "pizzerija"],
+        "query": "best pizza restaurants",
+        "label": "pizzerias",
+        "card_type": "restaurant",
+    },
+    "bakeries": {
+        "keywords": ["slastičar", "slasticar", "bakery", "pastry", "kolač", "kolac", "torta", "sladoled", "slastice", "dessert", "sweets", "cake", "cakes", "pastries"],
+        "query": "best bakeries pastry shops",
+        "label": "bakeries",
         "card_type": "restaurant",
     },
     "nightlife": {
@@ -18,7 +31,7 @@ CATEGORY_CONFIG = {
         "card_type": "activity",
     },
     "cafes": {
-        "keywords": ["cafe", "coffee", "kafić", "kafic", "espresso"],
+        "keywords": ["cafe", "coffee", "kafić", "kafic", "espresso", "kava", "kavana"],
         "query": "cozy cafes",
         "label": "cafés",
         "card_type": "restaurant",
@@ -30,12 +43,39 @@ CATEGORY_CONFIG = {
         "card_type": "hotel",
     },
     "activities": {
-        "keywords": ["things to do", "što raditi", "activities", "attractions", "poi", "zanimljivosti", "sights"],
+        "keywords": ["things to do", "što raditi", "activities", "attractions", "poi", "zanimljivosti", "sights", "znamenitost"],
         "query": "things to do",
         "label": "activities",
         "card_type": "activity",
     },
 }
+
+# Croatian city names for detection
+CROATIAN_CITIES = [
+    "zagreb", "split", "rijeka", "osijek", "zadar", "pula", "slavonski brod", "karlovac",
+    "varaždin", "šibenik", "sisak", "vinkovci", "dubrovnik", "bjelovar", "koprivnica",
+    "opatija", "rovinj", "poreč", "porec", "umag", "mali lošinj", "crikvenica", "senj",
+    "makarska", "trogir", "omiš", "omis", "hvar", "korčula", "korcula", "vis", "bol", "brač", "brac",
+    "ogulin", "samobor", "velika gorica", "požega", "vukovar", "virovitica", "čakovec",
+    "gospić", "knin", "sinj", "solin", "metković", "ploče", "novalja", "biograd", "nin",
+    "krk", "cres", "rab", "pag", "lošinj", "losinj", "murter", "primošten", "vodice",
+    "ičići", "lovran", "mošćenička draga", "kastav", "klana", "matulji", "opatija", "volosko",
+    # Otoci/mjesta
+    "omišalj", "malinska", "njivice", "baška", "vrbnik", "punat", "kornić", "dobrinj",
+]
+
+# Patterns to detect location queries in messages
+LOCATION_QUERY_PATTERNS = [
+    # Croatian patterns
+    r"(?:najbolj[aei]|dobr[aei]|preporuč[ui]|tražim|gdje|koji|kakvi|ima li)\s+(?:\w+\s+)?(?:\w+\s+)?(?:u|na)\s+([A-ZČĆŠĐŽa-zčćšđž\s]+?)(?:\?|$|,|\.|!)",
+    r"(?:u|na)\s+([A-ZČĆŠĐŽa-zčćšđž\s]+?)\s+(?:najbolj|dobr|preporuč|ima li|koji|kakvi)",
+    r"([A-ZČĆŠĐŽa-zčćšđž]+)\s+(?:restorani|kafići|slastičarnice|pizzerije|hoteli|barovi)",
+    # English patterns  
+    r"(?:best|good|recommend|find|where)\s+(?:\w+\s+)?(?:\w+\s+)?(?:in|at|near)\s+([A-Za-z\s]+?)(?:\?|$|,|\.|!)",
+    r"(?:in|at|near)\s+([A-Za-z\s]+?)\s+(?:restaurants?|cafes?|hotels?|bars?|clubs?)",
+    # German patterns
+    r"(?:beste|gute|empfehlen)\s+(?:\w+\s+)?(?:\w+\s+)?(?:in|bei)\s+([A-Za-zäöüÄÖÜß\s]+?)(?:\?|$|,|\.|!)",
+]
 
 DEFAULT_CATEGORY = "activities"
 
@@ -54,6 +94,16 @@ FALLBACK_TEMPLATES = {
         {"name": "Kavana Botanika", "address": "City park edge, {city}", "rating": 4.7},
         {"name": "Espresso Society", "address": "Main square, {city}", "rating": 4.6},
         {"name": "Velvet Roast", "address": "Art district, {city}", "rating": 4.5},
+    ],
+    "pizzerias": [
+        {"name": "Pizza Roma {city}", "address": "Main street, {city}", "rating": 4.7},
+        {"name": "Napoli Express", "address": "City center, {city}", "rating": 4.6},
+        {"name": "La Pizzeria", "address": "Old town, {city}", "rating": 4.5},
+    ],
+    "bakeries": [
+        {"name": "Dolce Vita {city}", "address": "Main square, {city}", "rating": 4.8},
+        {"name": "Sweet Dreams Bakery", "address": "City center, {city}", "rating": 4.6},
+        {"name": "Pasticceria Milano", "address": "Waterfront, {city}", "rating": 4.7},
     ],
     "hotels": [
         {"name": "Grand Palace {city}", "address": "Central boulevard", "rating": 4.8},
@@ -88,6 +138,55 @@ def get_category_label(category: str) -> str:
 
 def get_category_card_type(category: str) -> str:
     return CATEGORY_CONFIG.get(category, CATEGORY_CONFIG[DEFAULT_CATEGORY])["card_type"]
+
+
+def is_location_query(message: str) -> bool:
+    """Check if the message is asking about places/locations."""
+    msg = (message or "").lower()
+    
+    # Check for place-related keywords
+    place_keywords = [
+        "restoran", "restaurant", "kafić", "cafe", "coffee", "slastičar", "bakery", 
+        "pizza", "hotel", "bar", "club", "klub", "night", "noć", "znamenitost",
+        "attraction", "beach", "plaž", "museum", "muzej", "park", "najbolji", "best",
+        "preporuči", "recommend", "tražim", "find", "gdje", "where", "koji", "which"
+    ]
+    
+    has_place_keyword = any(kw in msg for kw in place_keywords)
+    
+    # Check for city names
+    has_city = any(city.lower() in msg for city in CROATIAN_CITIES)
+    
+    # Also check for location prepositions with question words
+    location_phrases = [
+        r"u\s+[A-ZČĆŠĐŽa-zčćšđž]+", r"in\s+[A-Za-z]+", r"na\s+[A-ZČĆŠĐŽa-zčćšđž]+",
+        r"restorani\b", r"kafići\b", r"slastičarnice\b", r"pizzerije\b", r"hoteli\b"
+    ]
+    has_location_phrase = any(re.search(pat, msg, re.IGNORECASE) for pat in location_phrases)
+    
+    return has_place_keyword and (has_city or has_location_phrase)
+
+
+def extract_city_from_message(message: str) -> Optional[str]:
+    """Extract city name from user message."""
+    msg = (message or "").lower()
+    
+    # First try to find a known Croatian city
+    for city in CROATIAN_CITIES:
+        if city.lower() in msg:
+            return city.title()
+    
+    # Try regex patterns
+    for pattern in LOCATION_QUERY_PATTERNS:
+        match = re.search(pattern, message, re.IGNORECASE)
+        if match:
+            potential_city = match.group(1).strip()
+            # Clean up the city name
+            potential_city = re.sub(r"[^\w\s]", "", potential_city).strip()
+            if potential_city and len(potential_city) > 2:
+                return potential_city.title()
+    
+    return None
 
 
 async def search_places(
