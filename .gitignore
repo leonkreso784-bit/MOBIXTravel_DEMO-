@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+venv/
+
+# Environment variables (VAŽNO - NE UPLOADAJ API KLJUČEVE!)
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+server_log.txt
+
+# Test files (nisu potrebni za produkciju)
+test_*.py
+comprehensive_test.py
+mobix_full_test.py
+test_results.txt
+TEST_PLAN.md
+EXPECTED_BEHAVIOR.md
+
+# Batch/script files (samo za lokalni razvoj)
+start.bat
+start_clean.bat
+start_server.bat
+start_server_verbose.bat
+start_with_key.ps1
+
+# Backup folders
+_backups/
+
+# UI folders koji NISU u upotrebi
+ui-new/
+ui/
+public/

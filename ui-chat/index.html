@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOBIX - AI Travel Chatbot</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-mode">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button id="backBtn" class="btn-back hidden" title="Back to Home">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="14" fill="url(#logo-gradient)"/>
+            <path d="M10 12L16 8L22 12V20L16 24L10 20V12Z" fill="white" opacity="0.9"/>
+            <defs>
+              <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#667eea"/>
+                <stop offset="100%" stop-color="#764ba2"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">MOBIX</span>
+        <span class="brand-tagline">Travel Planner</span>
+      </div>
+    </div>
+    
+    <div class="topbar-right">
+      <button id="profileBtn" class="btn-profile" title="Login / Register">
+        <span class="profile-text">Login / Register</span>
+        <svg class="profile-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+      
+      <button id="hamburgerBtn" class="btn-hamburger" title="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebarMenu" class="sidebar">
+    <div class="sidebar-header">
+      <h3>Menu</h3>
+      <button id="closeSidebar" class="btn-close-sidebar">✕</button>
+    </div>
+    <nav class="sidebar-nav">
+      <button id="sidebarChat" class="sidebar-item sidebar-item-primary" onclick="window.sidebarNavigate('chat')">
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2 5.5C2 4.11929 3.11929 3 4.5 3H15.5C16.8807 3 18 4.11929 18 5.5V12.5C18 13.8807 16.8807 15 15.5 15H11L7 18V15H4.5C3.11929 15 2 13.8807 2 12.5V5.5Z"/>
+        </svg>
+        <span>Chat Mode</span>
+      </button>
+      <button id="sidebarPlanner" class="sidebar-item" onclick="window.sidebarNavigate('planner')">
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2Z"/>
+        </svg>
+        <span>Planner Mode</span>
+      </button>
+      <button id="sidebarTravelNote" class="sidebar-item" onclick="window.sidebarNavigate('travelnote')">
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+          <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+        </svg>
+        <span>Travel Note</span>
+      </button>
+      
+      <div class="sidebar-divider"></div>
+      
+      <button id="sidebarAbout" class="sidebar-item" onclick="window.sidebarNavigate('about')">
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <span>📖 About Us</span>
+      </button>
+    </nav>
+  </div>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- HERO SCREEN -->
+  <div id="heroScreen" class="screen hero-screen">
+    <!-- Video Background -->
+    <div class="hero-video-container">
+      <video autoplay muted loop playsinline class="hero-video" poster="https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1920">
+        <source src="https://cdn.coverr.co/videos/coverr-flying-over-italian-coast/1080p.mp4" type="video/mp4">
+        <source src="https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+      </video>
+      <div class="hero-video-overlay"></div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="hero-text-wrapper">
+        <div class="hero-brand">
+          <span class="brand-welcome">Welcome to</span>
+          <h1 class="hero-logo">MOBIX<span class="brand-accent">Travel</span></h1>
+        </div>
+        <div class="hero-typing-container">
+          <span class="typing-text" id="typingText" data-texts='["Your AI Travel Assistant", "Plan Your Perfect Journey", "Discover Amazing Destinations", "Get Personalized Recommendations"]'></span>
+          <span class="typing-cursor">|</span>
+        </div>
+        <div class="hero-actions">
+          <button id="startChatting" class="btn-hero btn-primary">
+            <span class="btn-icon">💬</span>
+            Start Chatting
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why Choose MOBIX -->
+    <div class="features-section">
+      <div class="container">
+        <h2 class="section-title">Why Choose MOBIX?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>AI Chat Assistant</h3>
+            <p>Get personalized travel recommendations and instant answers to your questions</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Smart Itineraries</h3>
+            <p>Create, edit, and manage detailed day-by-day travel plans</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3>Budget Planning</h3>
+            <p>Calculate and track expenses for accommodation, food, transport, and activities</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Destination Guide</h3>
+            <p>Explore curated destinations with attractions, tips, and best times to visit</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">✈️</div>
+            <h3>Flight Integration</h3>
+            <p>Coming soon: Search and compare flights from multiple providers</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏨</div>
+            <h3>Hotel Booking</h3>
+            <p>Coming soon: Find the perfect accommodation for your trip</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Destinations -->
+    <div class="destinations-section">
+      <div class="container">
+        <h2 class="section-title dark">Popular Destinations</h2>
+        <div class="destinations-grid">
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>Paris</h3>
+              <span class="destination-country">France</span>
+            </div>
+            <p>The City of Light, famous for art, fashion, gastronomy and culture</p>
+            <div class="destination-tags">
+              <span class="tag">city</span>
+              <span class="tag">culture</span>
+              <span class="tag">art</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $150</div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>Tokyo</h3>
+              <span class="destination-country">Japan</span>
+            </div>
+            <p>A vibrant metropolis blending traditional culture with modern technology</p>
+            <div class="destination-tags">
+              <span class="tag">city</span>
+              <span class="tag">culture</span>
+              <span class="tag">technology</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $180</div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>Bali</h3>
+              <span class="destination-country">Indonesia</span>
+            </div>
+            <p>Tropical paradise known for beautiful beaches, rice terraces and spiritual culture</p>
+            <div class="destination-tags">
+              <span class="tag">beach</span>
+              <span class="tag">tropical</span>
+              <span class="tag">nature</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $80</div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>New York</h3>
+              <span class="destination-country">USA</span>
+            </div>
+            <p>The city that never sleeps, iconic skyline and cultural diversity</p>
+            <div class="destination-tags">
+              <span class="tag">city</span>
+              <span class="tag">culture</span>
+              <span class="tag">shopping</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $200</div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>Santorini</h3>
+              <span class="destination-country">Greece</span>
+            </div>
+            <p>Stunning Greek island with white-washed buildings and breathtaking sunsets</p>
+            <div class="destination-tags">
+              <span class="tag">beach</span>
+              <span class="tag">romantic</span>
+              <span class="tag">luxury</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $140</div>
+          </div>
+          <div class="destination-card">
+            <div class="destination-header">
+              <h3>Dubai</h3>
+              <span class="destination-country">UAE</span>
+            </div>
+            <p>Luxurious city with modern architecture and world-class shopping</p>
+            <div class="destination-tags">
+              <span class="tag">city</span>
+              <span class="tag">luxury</span>
+              <span class="tag">shopping</span>
+            </div>
+            <div class="destination-budget">Avg. Daily Budget: $180</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+      <div class="container">
+        <h2>Ready to Plan Your Next Adventure?</h2>
+        <p>Start chatting with our AI assistant or create your first itinerary</p>
+        <button class="btn-cta" onclick="window.sidebarNavigate('chat')">Start Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION CONTAINER -->
+  <div id="notificationContainer" class="notification-container"></div>
+
+  <!-- PROFILE SCREEN -->
+  <div id="profileScreen" class="screen profile-screen hidden">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-avatar-wrapper">
+          <div class="profile-avatar" id="profileAvatar">👤</div>
+          <button class="btn-change-avatar" id="changeAvatarBtn" title="Change Profile Picture">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+            </svg>
+          </button>
+          <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+        </div>
+        <div class="profile-name" id="profileName">Travel Enthusiast</div>
+        <div class="profile-email" id="profileEmail">user@mobix.app</div>
+        <button id="logoutBtn" class="btn-logout">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4.414l-4.293 4.293a1 1 0 01-1.414 0L4 7.414 5.414 6l3.293 3.293L13.586 4.5 15 5.914z" clip-rule="evenodd"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+
+      <div class="profile-tabs">
+        <button class="profile-tab active" data-tab="personal">Personal Info</button>
+        <button class="profile-tab" data-tab="preferences">Travel Preferences</button>
+        <button class="profile-tab" data-tab="stats">My Stats</button>
+      </div>
+
+      <div class="profile-content">
+        <!-- Personal Info Tab -->
+        <div class="profile-tab-content active" data-content="personal">
+          <div class="profile-card">
+            <h3>Personal Information</h3>
+            <div class="profile-form-group">
+              <label>Full Name</label>
+              <input type="text" placeholder="Enter your full name" value="Travel Enthusiast">
+            </div>
+            <div class="profile-form-group">
+              <label>Email</label>
+              <input type="email" placeholder="your@email.com" value="user@mobix.app">
+            </div>
+            <div class="profile-form-group">
+              <label>Phone</label>
+              <input type="tel" placeholder="+1 234 567 8900">
+            </div>
+            <div class="profile-form-group">
+              <label>Location</label>
+              <input type="text" placeholder="Your city, country">
+            </div>
+            <div class="profile-actions">
+              <button class="btn-profile btn-profile-secondary">Cancel</button>
+              <button class="btn-profile btn-profile-primary">Save Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Travel Preferences Tab -->
+        <div class="profile-tab-content" data-content="preferences">
+          <div class="profile-card">
+            <h3>Travel Style</h3>
+            <div class="preference-chips">
+              <div class="preference-chip selected">Adventure</div>
+              <div class="preference-chip">Relaxation</div>
+              <div class="preference-chip">Culture</div>
+              <div class="preference-chip">Food & Dining</div>
+              <div class="preference-chip">Nature</div>
+              <div class="preference-chip">Shopping</div>
+              <div class="preference-chip">Nightlife</div>
+              <div class="preference-chip">Photography</div>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <h3>Budget Range</h3>
+            <div class="profile-form-group">
+              <label>Daily Budget</label>
+              <select>
+                <option>Budget ($50-$100)</option>
+                <option selected>Mid-range ($100-$200)</option>
+                <option>Luxury ($200+)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <h3>Accommodation Preferences</h3>
+            <div class="preference-chips">
+              <div class="preference-chip selected">Hotels</div>
+              <div class="preference-chip">Hostels</div>
+              <div class="preference-chip">Airbnb</div>
+              <div class="preference-chip">Resorts</div>
+              <div class="preference-chip">Boutique Hotels</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="profile-tab-content" data-content="stats">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">12</div>
+              <div class="stat-label">Countries Visited</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">28</div>
+              <div class="stat-label">Cities Explored</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">5</div>
+              <div class="stat-label">Active Plans</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">47</div>
+              <div class="stat-label">Travel Notes</div>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <h3>Recent Destinations</h3>
+            <div class="profile-form-group">
+              <textarea readonly>Paris, France (May 2024)
+Tokyo, Japan (March 2024)
+Bali, Indonesia (January 2024)
+New York, USA (November 2023)</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANNER SCREEN -->
+  <div id="plannerScreen" class="screen planner-screen hidden">
+    <div class="planner-layout">
+      <!-- Left Sidebar - Itineraries List -->
+      <div class="planner-sidebar">
+        <div class="planner-sidebar-header">
+          <h3>Your Itineraries</h3>
+        </div>
+        <div class="planner-list" id="plannerList">
+          <!-- Itineraries will be listed here -->
+        </div>
+        <button class="btn-add-itinerary" id="btnAddItinerary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          New Itinerary
+        </button>
+      </div>
+
+      <!-- Right Content - Itinerary Editor -->
+      <div class="planner-content">
+        <!-- Empty State -->
+        <div class="planner-empty-state" id="plannerEmptyState">
+          <div class="empty-icon">📅</div>
+          <h3>No itinerary selected</h3>
+          <p>Select an itinerary from the list or create a new one</p>
+          <button class="btn-primary" onclick="document.getElementById('btnAddItinerary').click()">
+            Create Itinerary
+          </button>
+        </div>
+
+        <!-- Itinerary Editor Form -->
+        <div class="planner-editor hidden" id="plannerEditor">
+          <div class="planner-editor-header">
+            <h2 id="plannerEditorTitle">New Itinerary</h2>
+            <div class="planner-editor-actions">
+              <button class="btn-save-itinerary" id="btnSaveItinerary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                  <polyline points="7,3 7,8 15,8"></polyline>
+                </svg>
+                Save
+              </button>
+              <button class="btn-delete-itinerary" id="btnDeleteItinerary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3,6 5,6 21,6"></polyline>
+                  <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <form class="planner-form" id="plannerForm">
+            <!-- Basic Info Row -->
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="itineraryOrigin">Origin (Starting City)</label>
+                <input type="text" id="itineraryOrigin" placeholder="e.g. Rijeka, Zagreb" required>
+              </div>
+              <div class="form-group flex-2">
+                <label for="itineraryDestination">Destination</label>
+                <input type="text" id="itineraryDestination" placeholder="e.g. Paris, France" required>
+              </div>
+            </div>
+
+            <!-- Dates and Budget Row -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="itineraryStartDate">Start Date</label>
+                <input type="date" id="itineraryStartDate" required>
+              </div>
+              <div class="form-group">
+                <label for="itineraryEndDate">End Date</label>
+                <input type="date" id="itineraryEndDate" required>
+              </div>
+              <div class="form-group">
+                <label for="itineraryBudget">Budget ($)</label>
+                <input type="number" id="itineraryBudget" placeholder="1500" min="0">
+              </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="generate-section">
+              <button type="button" class="btn-generate" id="btnGenerate">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                  <path d="M2 17l10 5 10-5"></path>
+                  <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                Generate Travel Plan
+              </button>
+              <p class="generate-hint">AI will find flights, hotels, restaurants & activities for your trip</p>
+            </div>
+
+            <!-- Generated Results Section -->
+            <div class="generated-results hidden" id="generatedResults">
+              <div class="results-loading hidden" id="resultsLoading">
+                <div class="loading-spinner"></div>
+                <p>Generating your perfect travel plan...</p>
+              </div>
+
+              <!-- Transport Options -->
+              <div class="results-category" id="transportResults">
+                <div class="category-header">
+                  <span class="category-icon">✈️</span>
+                  <h3>Transportation</h3>
+                </div>
+                <div class="options-grid" id="transportOptions"></div>
+              </div>
+
+              <!-- Hotel Options -->
+              <div class="results-category" id="hotelResults">
+                <div class="category-header">
+                  <span class="category-icon">🏨</span>
+                  <h3>Hotels</h3>
+                </div>
+                <div class="options-grid" id="hotelOptions"></div>
+              </div>
+
+              <!-- Restaurant Options -->
+              <div class="results-category" id="restaurantResults">
+                <div class="category-header">
+                  <span class="category-icon">🍽️</span>
+                  <h3>Restaurants</h3>
+                </div>
+                <div class="options-grid" id="restaurantOptions"></div>
+              </div>
+
+              <!-- Activity Options -->
+              <div class="results-category" id="activityResults">
+                <div class="category-header">
+                  <span class="category-icon">🎯</span>
+                  <h3>Activities</h3>
+                </div>
+                <div class="options-grid" id="activityOptions"></div>
+              </div>
+            </div>
+
+            <!-- Daily Plan Section -->
+            <div class="daily-plan-section">
+              <div class="section-header">
+                <h3>Daily Plan</h3>
+                <button type="button" class="btn-add-day" id="btnAddDay">+ Add Day</button>
+              </div>
+              <div class="days-container" id="daysContainer">
+                <!-- Days will be added here dynamically -->
+              </div>
+            </div>
+
+            <!-- Trip Notes -->
+            <div class="form-group">
+              <label for="itineraryNotes">Trip Notes</label>
+              <textarea id="itineraryNotes" rows="3" placeholder="Add any additional notes about your trip..."></textarea>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAVEL NOTE SCREEN -->
+  <div id="travelNoteScreen" class="screen travelnote-screen hidden">
+    <div class="travelnote-layout">
+      <!-- Notes Sidebar -->
+      <div class="travelnote-sidebar">
+        <div class="travelnote-sidebar-header">
+          <h3>📝 My Notes</h3>
+          <button id="btnNewNote" class="btn-new-note" title="New Note">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="travelNotesList" class="travelnote-list">
+          <!-- Notes list will be populated dynamically -->
+        </div>
+      </div>
+      
+      <!-- Main Editor Area -->
+      <div class="travelnote-main">
+        <!-- Empty State (when no note selected) -->
+        <div id="noteEmptyState" class="note-empty-state">
+          <div class="empty-illustration">
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>
+          </div>
+          <h2>Your Travel Notes</h2>
+          <p>Create a new note or add items from Chat to get started!</p>
+          <button class="btn-create-first-note" onclick="window.MOBIX.createNewTravelNote()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+            </svg>
+            Create First Note
+          </button>
+        </div>
+        
+        <!-- Note Editor Container -->
+        <div id="noteEditorContainer" class="note-editor-container hidden">
+          <!-- Note Header -->
+          <div class="note-editor-header">
+            <input type="text" id="noteTitle" class="note-title-input" placeholder="Note Title..." maxlength="100">
+            <div class="note-header-actions">
+              <span id="noteSaveStatus" class="note-save-status saved">Saved</span>
+              <button id="btnSaveNote" class="btn-save-note" title="Save Note">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                  <polyline points="7,3 7,8 15,8"></polyline>
+                </svg>
+              </button>
+              <button id="btnClearNote" class="btn-clear-note" title="Clear Items">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Note Content Editor -->
+          <div class="note-content-section">
+            <label class="note-section-label">✍️ Your Notes</label>
+            <textarea id="noteContent" class="note-content-textarea" placeholder="Write your travel ideas, plans, and reminders here...
+
+✈️ Ideas for destinations
+🏨 Hotels to check
+🍽️ Restaurants to try
+🎯 Activities to do
+📅 Important dates
+💰 Budget notes
+
+Tip: Add items directly from Chat using the 'Add to Travel Note' button!"></textarea>
+          </div>
+          
+          <!-- Saved Cards Section -->
+          <div class="note-cards-section">
+            <label class="note-section-label">📌 Saved Items from Chat</label>
+            <div id="noteSavedCards" class="note-saved-cards">
+              <div class="no-cards-message">No saved items yet. Add items from Chat!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Travel Plan Modal -->
+  <div id="createPlanModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content create-plan-modal">
+      <div class="modal-header">
+        <h2>✨ Create Travel Plan</h2>
+        <button class="modal-close" onclick="document.getElementById('createPlanModal').classList.add('hidden')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createPlanForm">
+          <div class="form-group">
+            <label for="planTitle">Plan Title</label>
+            <input type="text" id="planTitle" placeholder="e.g. Summer Adventure 2025" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="planDestination">Destination</label>
+              <input type="text" id="planDestination" placeholder="e.g. Barcelona, Spain" required>
+            </div>
+            <div class="form-group">
+              <label for="planBudget">Budget ($)</label>
+              <input type="number" id="planBudget" placeholder="2000" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="planStartDate">Start Date</label>
+              <input type="date" id="planStartDate" required>
+            </div>
+            <div class="form-group">
+              <label for="planEndDate">End Date</label>
+              <input type="date" id="planEndDate" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="planNotes">Initial Notes (optional)</label>
+            <textarea id="planNotes" rows="3" placeholder="Any specific things you want to do or see..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="document.getElementById('createPlanModal').classList.add('hidden')">Cancel</button>
+        <button type="submit" form="createPlanForm" class="btn-primary" id="btnSubmitPlan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Create Plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chatScreen" class="screen chat-screen hidden">
+    <div class="chat-layout">
+      <!-- Chat History Sidebar -->
+      <div class="chat-sidebar">
+        <div class="chat-sidebar-header">
+          <h3>Razgovori</h3>
+          <button id="newChatBtn" class="btn-new-chat" title="Novi razgovor">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="chatHistoryList" class="chat-history-list">
+          <!-- Chat history items will be dynamically inserted here -->
+        </div>
+      </div>
+      
+      <!-- Main Chat Area -->
+      <div class="chat-main">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-area">
+          <textarea id="chatInput" class="chat-input" placeholder="Ask me anything about travel planning..." rows="1"></textarea>
+          <button id="sendBtn" class="btn-send">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M2 10L18 2L10 18L9 11L2 10Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <div class="chat-input-hint">Press Enter to send, Shift + Enter for new line</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+      <button class="auth-close" id="authCloseBtn">&times;</button>
+      
+      <!-- Login Form -->
+      <div id="loginForm" class="auth-form active">
+        <div class="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue your journey</p>
+        </div>
+        
+        <form id="loginFormElement">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required placeholder="your@email.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••">
+          </div>
+          
+          <button type="submit" class="btn-auth-submit">Sign In</button>
+        </form>
+        
+        <div class="auth-switch">
+          Don't have an account? <a href="#" id="showRegister">Create one</a>
+        </div>
+      </div>
+      
+      <!-- Register Form -->
+      <div id="registerForm" class="auth-form">
+        <div class="auth-header">
+          <h2>Join MOBIX</h2>
+          <p>Create your account and start planning</p>
+        </div>
+        
+        <form id="registerFormElement">
+          <!-- Step 1: Basic Info -->
+          <div class="register-step active" data-step="1">
+            <div class="form-group">
+              <label for="registerEmail">Email</label>
+              <input type="email" id="registerEmail" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+              <label for="registerUsername">Username</label>
+              <input type="text" id="registerUsername" required placeholder="Choose a username" minlength="3">
+            </div>
+            
+            <div class="form-group">
+              <label for="registerPassword">Password</label>
+              <input type="password" id="registerPassword" required placeholder="Minimum 6 characters" minlength="6">
+            </div>
+            
+            <button type="button" class="btn-auth-submit" id="nextToSurvey">Continue to Survey</button>
+          </div>
+          
+          <!-- Step 2: Survey -->
+          <div class="register-step" data-step="2">
+            <div class="survey-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%"></div>
+              </div>
+              <p class="progress-text">Complete your profile (6 questions)</p>
+            </div>
+            
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" required placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input type="date" id="dateOfBirth" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Gender</label>
+              <div class="chip-group">
+                <button type="button" class="chip" data-value="male">Male</button>
+                <button type="button" class="chip" data-value="female">Female</button>
+                <button type="button" class="chip" data-value="other">Other</button>
+                <button type="button" class="chip" data-value="prefer-not">Prefer not to say</button>
+              </div>
+              <input type="hidden" id="gender" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" id="country" required placeholder="Croatia">
+            </div>
+            
+            <div class="form-group">
+              <label>Main Reason for Travel</label>
+              <div class="chip-group">
+                <button type="button" class="chip" data-value="leisure">🏖️ Leisure</button>
+                <button type="button" class="chip" data-value="business">💼 Business</button>
+                <button type="button" class="chip" data-value="adventure">⛰️ Adventure</button>
+                <button type="button" class="chip" data-value="family">👨‍👩‍👧 Family</button>
+                <button type="button" class="chip" data-value="culture">🎭 Culture</button>
+                <button type="button" class="chip" data-value="relaxation">🧘 Relaxation</button>
+              </div>
+              <input type="hidden" id="travelReasons" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Travel Frequency</label>
+              <div class="chip-group">
+                <button type="button" class="chip" data-value="rarely">Rarely (Once a year)</button>
+                <button type="button" class="chip" data-value="sometimes">Sometimes (2-3 times/year)</button>
+                <button type="button" class="chip" data-value="often">Often (4-6 times/year)</button>
+                <button type="button" class="chip" data-value="frequent">Frequent (7+ times/year)</button>
+              </div>
+              <input type="hidden" id="travelFrequency" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Preferred Budget Range</label>
+              <div class="chip-group">
+                <button type="button" class="chip" data-value="budget">💰 Budget (€0-500/day)</button>
+                <button type="button" class="chip" data-value="moderate">💳 Moderate (€500-1000/day)</button>
+                <button type="button" class="chip" data-value="luxury">💎 Luxury (€1000+/day)</button>
+              </div>
+              <input type="hidden" id="budget" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="interests">Interests (optional)</label>
+              <textarea id="interests" placeholder="E.g., hiking, photography, food, history..." rows="3"></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-auth-secondary" id="backToBasic">Back</button>
+              <button type="submit" class="btn-auth-submit">Complete Registration</button>
+            </div>
+          </div>
+        </form>
+        
+        <div class="auth-switch">
+          Already have an account? <a href="#" id="showLogin">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT US SCREEN -->
+  <div id="aboutScreen" class="screen about-screen hidden">
+    <div class="about-container">
+      <!-- Hero Section -->
+      <div class="about-hero">
+        <div class="about-hero-content">
+          <span class="about-badge">🌍 Our Story</span>
+          <h1 class="about-title">About <span class="gradient-text">MOBIX</span></h1>
+          <p class="about-subtitle">Travel Reimagined — Born from curiosity, built with passion</p>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="about-content">
+        <!-- Origin Story -->
+        <section class="about-section">
+          <div class="about-section-header">
+            <span class="section-emoji">✨</span>
+            <h2>The Beginning</h2>
+          </div>
+          <div class="about-text-block">
+            <p>MOBIX wasn't created in a boardroom, nor as a corporate project. It began with a single traveler — a young creator named <strong>Leon</strong>, who believed that trip planning should feel inspiring, not overwhelming.</p>
+            <p>Like millions of people, Leon loved exploring new places. But every time he planned a trip, he found himself drowning in dozens of tabs: flight searches, hotel comparisons, transfers, budgeting, weather checks, local activities, hidden spots, and endless logistics that stole the excitement from travel itself.</p>
+            <p class="quote-highlight">"Why does planning a journey feel harder than the journey itself?"</p>
+            <p>There was no platform that understood the traveler holistically. No assistant that could think, reason, adapt, and build a complete trip from start to finish. No system that connected travel inspiration with real, actionable plans.</p>
+            <p><strong>So Leon decided to build it himself.</strong></p>
+          </div>
+        </section>
+
+        <!-- The Vision -->
+        <section class="about-section">
+          <div class="about-section-header">
+            <span class="section-emoji">🚀</span>
+            <h2>The Vision Behind MOBIX</h2>
+          </div>
+          <div class="about-text-block">
+            <p>What started as a small experiment — a personal side project — quickly evolved into something much bigger. While studying hospitality management and learning to code, Leon dreamed of combining the worlds of travel and technology.</p>
+            <p>He imagined a platform that worked like a real human assistant:</p>
+          </div>
+          <div class="vision-grid">
+            <div class="vision-item">
+              <span class="vision-icon">🧠</span>
+              <span>Remembers who you are</span>
+            </div>
+            <div class="vision-item">
+              <span class="vision-icon">💡</span>
+              <span>Learns your preferences</span>
+            </div>
+            <div class="vision-item">
+              <span class="vision-icon">🎯</span>
+              <span>Understands what kind of traveler you are</span>
+            </div>
+            <div class="vision-item">
+              <span class="vision-icon">🗺️</span>
+              <span>Finds the smartest routes</span>
+            </div>
+            <div class="vision-item">
+              <span class="vision-icon">💰</span>
+              <span>Adapts to your schedule and budget</span>
+            </div>
+            <div class="vision-item">
+              <span class="vision-icon">📋</span>
+              <span>Builds complete, dynamic itineraries automatically</span>
+            </div>
+          </div>
+          <div class="about-text-block">
+            <p>A platform powered by <strong>advanced AI</strong>, but designed with a <strong>human touch</strong>. This vision became the core of MOBIX.</p>
+          </div>
+        </section>
+
+        <!-- Building Different -->
+        <section class="about-section">
+          <div class="about-section-header">
+            <span class="section-emoji">🔧</span>
+            <h2>Building a Travel Assistant, Not Another Booking Site</h2>
+          </div>
+          <div class="about-text-block">
+            <p>Unlike typical booking platforms that simply display lists, MOBIX was built with a deeper purpose: <strong>to simplify the complexity of travel</strong>.</p>
+            <p>MOBIX connects flights, accommodation, transportation, activities, maps, and user preferences — all through intelligent automation. The system analyzes routes, compares options, understands constraints, and builds travel plans that actually make sense.</p>
+            <p>The idea was not just to build another travel tool.<br>The idea was to build <strong>a smarter companion</strong>.</p>
+          </div>
+          <div class="companion-features">
+            <div class="companion-item">
+              <span class="companion-check">✓</span>
+              <span>Available 24/7</span>
+            </div>
+            <div class="companion-item">
+              <span class="companion-check">✓</span>
+              <span>Talks with you naturally</span>
+            </div>
+            <div class="companion-item">
+              <span class="companion-check">✓</span>
+              <span>Handles the planning so you can focus on the experience</span>
+            </div>
+          </div>
+          <p class="about-highlight-text">Travel shouldn't be stressful. MOBIX exists to prove that.</p>
+        </section>
+
+        <!-- Global Mission -->
+        <section class="about-section">
+          <div class="about-section-header">
+            <span class="section-emoji">🌐</span>
+            <h2>From a Local Idea to a Global Mission</h2>
+          </div>
+          <div class="about-text-block">
+            <p>What started as Leon's personal solution soon grew into a much larger mission: <strong>to revolutionize how the world travels</strong>.</p>
+            <p>MOBIX aims to create a global ecosystem where planning is effortless — whether you're backpacking through Southeast Asia, flying across Europe, or exploring hidden towns no travel app has ever documented.</p>
+            <p>Through powerful API integrations with airlines, hotels, transportation systems, and local tourism data, MOBIX brings together millions of pieces of information into one seamless experience.</p>
+            <p class="quote-highlight">Every traveler deserves a smarter way to explore the world.</p>
+          </div>
+        </section>
+
+        <!-- Values -->
+        <section class="about-section">
+          <div class="about-section-header">
+            <span class="section-emoji">🧭</span>
+            <h2>Our Values</h2>
+          </div>
+          <div class="values-grid">
+            <div class="value-card">
+              <div class="value-icon">✨</div>
+              <h3>Simplicity</h3>
+              <p>Travel should be intuitive, not complicated.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">🎨</div>
+              <h3>Personalization</h3>
+              <p>Every journey begins with understanding the traveler.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">⚡</div>
+              <h3>Innovation</h3>
+              <p>Technology should feel like magic, not machinery.</p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">🕊️</div>
+              <h3>Freedom</h3>
+              <p>Exploring the world should be possible for everyone.</p>
+            </div>
+          </div>
+          <p class="values-footer">These values guide every feature we create and every line of code we write.</p>
+        </section>
+
+        <!-- Future -->
+        <section class="about-section about-future">
+          <div class="about-section-header">
+            <span class="section-emoji">🌟</span>
+            <h2>Where MOBIX Is Going Next</h2>
+          </div>
+          <div class="about-text-block">
+            <p>The journey is far from over. MOBIX continues to evolve with new features, deeper intelligence, and expanded global integrations.</p>
+            <p class="future-goal">To become the world's most intuitive AI-powered travel platform.</p>
+            <p>Not just a tool. Not just an assistant. But <strong>the center of modern travel</strong>.</p>
+            <p>With each update, MOBIX moves closer to turning Leon's vision into a global reality — a platform used by millions, reshaping the future of how people move through the world.</p>
+          </div>
+        </section>
+
+        <!-- Closing -->
+        <section class="about-closing">
+          <div class="closing-content">
+            <h2>✨ MOBIX — Travel Reimagined</h2>
+            <p class="closing-tagline">MOBIX is more than software. It's a story. A mission. A new way of experiencing the world.</p>
+            <div class="closing-points">
+              <span>Born from curiosity.</span>
+              <span>Built with passion.</span>
+              <span>Driven by the belief that the future of travel should be smarter, easier, and more human.</span>
+            </div>
+            <p class="closing-welcome">Welcome to <strong>MOBIX</strong> — the future of travel planning.</p>
+            <button class="btn-start-exploring" onclick="window.sidebarNavigate('chat')">
+              <span>🚀 Start Exploring</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="about-footer">
+          <div class="footer-content">
+            <p>© 2025 MOBIX. All rights reserved by Leon Kreso.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="confirm-modal">
+    <div class="confirm-modal-content">
+      <div class="confirm-modal-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h3 id="confirmModalTitle">Are you sure?</h3>
+      <p id="confirmModalMessage">This action cannot be undone.</p>
+      <div class="confirm-modal-buttons">
+        <button id="confirmModalCancel" class="btn-confirm-cancel">Cancel</button>
+        <button id="confirmModalOk" class="btn-confirm-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/travelnote.js"></script>
+</body>
+</html>
+

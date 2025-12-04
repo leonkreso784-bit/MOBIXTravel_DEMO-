@@ -1,0 +1,1254 @@
+/* Travel Note Screen - New Sidebar Layout */
+.travelnote-screen {
+  display: none;
+  opacity: 0;
+  min-height: 100vh;
+  padding-top: 60px;
+  background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf4 100%);
+}
+
+body.dark-mode .travelnote-screen {
+  background: linear-gradient(180deg, #0f0f1e 0%, #1a1a2e 100%);
+}
+
+.travelnote-screen.active {
+  display: block;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Main Layout with Sidebar */
+.travelnote-layout {
+  display: flex;
+  height: calc(100vh - 60px);
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Notes Sidebar */
+.travelnote-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.dark-mode .travelnote-sidebar {
+  background: #1a1a2e;
+  border-right-color: #2d2d44;
+}
+
+.travelnote-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+body.dark-mode .travelnote-sidebar-header {
+  border-bottom-color: #2d2d44;
+}
+
+.travelnote-sidebar-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+body.dark-mode .travelnote-sidebar-header h3 {
+  color: white;
+}
+
+.btn-new-note {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-new-note:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Notes List */
+.travelnote-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.notes-list-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+body.dark-mode .notes-list-empty {
+  color: #94a3b8;
+}
+
+.note-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .note-list-item {
+  background: #0f0f1e;
+}
+
+.note-list-item:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+}
+
+body.dark-mode .note-list-item:hover {
+  background: #1f1f3a;
+}
+
+.note-list-item.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-left: 3px solid #667eea;
+}
+
+body.dark-mode .note-list-item.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+}
+
+.note-item-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
+  min-width: 0;
+}
+
+.note-item-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.note-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+body.dark-mode .note-item-title {
+  color: white;
+}
+
+.note-item-meta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+body.dark-mode .note-item-meta {
+  color: #94a3b8;
+}
+
+.note-item-delete {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.note-list-item:hover .note-item-delete {
+  opacity: 1;
+}
+
+.note-item-delete:hover {
+  background: #fee2e2;
+}
+
+/* Main Editor Area */
+.travelnote-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f5f7fa;
+}
+
+body.dark-mode .travelnote-main {
+  background: #0f0f1e;
+}
+
+/* Empty State */
+.note-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.note-empty-state .empty-illustration {
+  margin-bottom: 24px;
+  opacity: 0.4;
+}
+
+.note-empty-state .empty-illustration svg {
+  stroke: #64748b;
+}
+
+body.dark-mode .note-empty-state .empty-illustration svg {
+  stroke: #94a3b8;
+}
+
+.note-empty-state h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .note-empty-state h2 {
+  color: white;
+}
+
+.note-empty-state p {
+  color: #64748b;
+  margin-bottom: 24px;
+  font-size: 15px;
+}
+
+body.dark-mode .note-empty-state p {
+  color: #94a3b8;
+}
+
+.btn-create-first-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-create-first-note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Note Editor Container */
+.note-editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.note-editor-container.hidden {
+  display: none;
+}
+
+/* Note Editor Header */
+.note-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: white;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .note-editor-header {
+  background: #1a1a2e;
+}
+
+.note-title-input {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1a2e;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+body.dark-mode .note-title-input {
+  color: white;
+}
+
+.note-title-input::placeholder {
+  color: #94a3b8;
+}
+
+.note-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.note-save-status {
+  font-size: 13px;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.note-save-status.saving {
+  color: #f59e0b;
+}
+
+.btn-save-note,
+.btn-clear-note {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+body.dark-mode .btn-save-note,
+body.dark-mode .btn-clear-note {
+  background: #2d2d44;
+  color: #94a3b8;
+}
+
+.btn-save-note:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.btn-clear-note:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Note Content Section */
+.note-content-section {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .note-content-section {
+  background: #1a1a2e;
+}
+
+.note-section-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .note-section-label {
+  color: #94a3b8;
+}
+
+.note-content-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  background: #f8fafc;
+  resize: vertical;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+body.dark-mode .note-content-textarea {
+  background: #0f0f1e;
+  border-color: #2d2d44;
+  color: white;
+}
+
+.note-content-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+
+body.dark-mode .note-content-textarea:focus {
+  background: #1a1a2e;
+}
+
+.note-content-textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Saved Cards Section */
+.note-cards-section {
+  flex: 1;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+}
+
+body.dark-mode .note-cards-section {
+  background: #1a1a2e;
+}
+
+.note-saved-cards {
+  margin-top: 12px;
+}
+
+.no-cards-message {
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+body.dark-mode .no-cards-message {
+  color: #94a3b8;
+}
+
+/* Card Sections */
+.note-card-section {
+  margin-bottom: 24px;
+}
+
+.note-card-section:last-child {
+  margin-bottom: 0;
+}
+
+.note-card-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+body.dark-mode .note-card-section-title {
+  color: white;
+  border-bottom-color: #2d2d44;
+}
+
+.note-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Note Card */
+.note-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .note-card {
+  background: #0f0f1e;
+}
+
+.note-card:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+}
+
+body.dark-mode .note-card:hover {
+  background: #1f1f3a;
+}
+
+.note-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark-mode .note-card-title {
+  color: white;
+}
+
+.note-card-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark-mode .note-card-subtitle {
+  color: #94a3b8;
+}
+
+.note-card-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #667eea;
+  margin-top: 4px;
+}
+
+.note-card-remove {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.note-card:hover .note-card-remove {
+  opacity: 1;
+}
+
+.note-card-remove:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .travelnote-layout {
+    flex-direction: column;
+  }
+  
+  .travelnote-sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  body.dark-mode .travelnote-sidebar {
+    border-bottom-color: #2d2d44;
+  }
+  
+  .travelnote-main {
+    flex: 1;
+    min-height: 0;
+  }
+  
+  .note-editor-container {
+    padding: 16px;
+  }
+  
+  .note-editor-header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .note-title-input {
+    font-size: 18px;
+    width: 100%;
+  }
+  
+  .note-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.notes-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+body.dark-mode .notes-header h3 {
+  color: white;
+}
+
+.notes-hint {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.notes-editor-container {
+  margin-bottom: 16px;
+}
+
+.travel-notes-editor {
+  width: 100%;
+  min-height: 250px;
+  padding: 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+  background: #f8fafc;
+  color: #1a1a2e;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .travel-notes-editor {
+  background: #0f0f1e;
+  border-color: #2d2d44;
+  color: white;
+}
+
+.travel-notes-editor:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.travel-notes-editor::placeholder {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.notes-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-save-notes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save-notes:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.notes-saved-status {
+  font-size: 13px;
+  color: #10b981;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.notes-saved-status.show {
+  opacity: 1;
+}
+
+/* Saved Items Section */
+.saved-items-section {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .saved-items-section {
+  background: #1a1a2e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.saved-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+body.dark-mode .saved-items-header {
+  border-bottom-color: #2d2d44;
+}
+
+.saved-items-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+body.dark-mode .saved-items-header h3 {
+  color: white;
+}
+
+.saved-items-hint {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Smaller empty state for saved items */
+.saved-items-section .trip-empty {
+  padding: 40px 20px;
+}
+
+.saved-items-section .trip-empty p {
+  margin-bottom: 0;
+}
+
+.saved-items-section .empty-illustration {
+  margin-bottom: 16px;
+}
+
+/* Create Plan Modal */
+.create-plan-modal {
+  max-width: 500px;
+  width: 90%;
+}
+
+.create-plan-modal .modal-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+body.dark-mode .create-plan-modal .modal-header {
+  border-bottom-color: #2d2d44;
+}
+
+.create-plan-modal .modal-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+body.dark-mode .create-plan-modal .modal-header h2 {
+  color: white;
+}
+
+.create-plan-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.create-plan-modal label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+body.dark-mode .create-plan-modal label {
+  color: #e5e7eb;
+}
+
+.create-plan-modal input,
+.create-plan-modal textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 15px;
+  background: #f8fafc;
+  color: #1a1a2e;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .create-plan-modal input,
+body.dark-mode .create-plan-modal textarea {
+  background: #0f0f1e;
+  border-color: #2d2d44;
+  color: white;
+}
+
+.create-plan-modal input:focus,
+.create-plan-modal textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.create-plan-modal .form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.create-plan-modal .form-row .form-group {
+  flex: 1;
+}
+
+.create-plan-modal .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+body.dark-mode .create-plan-modal .modal-footer {
+  border-top-color: #2d2d44;
+}
+
+.create-plan-modal .btn-secondary {
+  padding: 12px 24px;
+  background: #f1f5f9;
+  color: #64748b;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .create-plan-modal .btn-secondary {
+  background: #2d2d44;
+  color: #94a3b8;
+}
+
+.create-plan-modal .btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+body.dark-mode .create-plan-modal .btn-secondary:hover {
+  background: #3d3d5c;
+}
+
+.create-plan-modal .btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-plan-modal .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Modal base styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+body.dark-mode .modal-content {
+  background: #1a1a2e;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .modal-close {
+  background: #2d2d44;
+  color: #94a3b8;
+}
+
+.modal-close:hover {
+  background: #e2e8f0;
+  color: #1a1a2e;
+}
+
+body.dark-mode .modal-close:hover {
+  background: #3d3d5c;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .trip-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .trip-header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-create-plan {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .notes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .saved-items-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .create-plan-modal .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* ========================================
+   FULL TRAVEL NOTE CARDS (Like Chat Cards)
+   ======================================== */
+
+.travel-note-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border-left: 4px solid #4F46E5;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .travel-note-card {
+  background: #1F2937;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.travel-note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .travel-note-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Card Image */
+.travel-note-card-image {
+  width: 100%;
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  background-color: linear-gradient(135deg, #667eea30, #764ba230);
+}
+
+/* Card Body */
+.travel-note-card-body {
+  padding: 16px 20px;
+}
+
+/* Card Header */
+.travel-note-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.travel-note-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.travel-note-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+
+body.dark-mode .travel-note-card-title {
+  color: #F9FAFB;
+}
+
+/* Card Subtitle */
+.travel-note-card-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.dark-mode .travel-note-card-subtitle {
+  color: #9CA3AF;
+}
+
+.travel-note-card-subtitle::before {
+  content: '📍';
+  font-size: 12px;
+}
+
+/* Card Details */
+.travel-note-card-details {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+body.dark-mode .travel-note-card-details {
+  color: #D1D5DB;
+  background: #111827;
+}
+
+/* Card Meta (Rating, Price) */
+.travel-note-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+body.dark-mode .travel-note-card-meta {
+  border-top-color: #374151;
+}
+
+.travel-note-card-rating {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+.travel-note-card-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* Card Actions */
+.travel-note-card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.travel-note-card-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  background: #f1f5f9;
+  color: #4F46E5;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .travel-note-card-link {
+  background: #374151;
+  color: #A5B4FC;
+}
+
+.travel-note-card-link:hover {
+  background: #4F46E5;
+  color: white;
+}
+
+.travel-note-card-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .travel-note-card-remove {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+}
+
+.travel-note-card-remove:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* Card without image */
+.travel-note-card:not(:has(.travel-note-card-image)) .travel-note-card-body {
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .travel-note-card-image {
+    height: 120px;
+  }
+  
+  .travel-note-card-body {
+    padding: 14px 16px;
+  }
+  
+  .travel-note-card-header {
+    gap: 10px;
+  }
+  
+  .travel-note-card-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .travel-note-card-title {
+    font-size: 15px;
+  }
+  
+  .travel-note-card-actions {
+    flex-direction: column;
+  }
+  
+  .travel-note-card-link,
+  .travel-note-card-remove {
+    width: 100%;
+    justify-content: center;
+  }
+}

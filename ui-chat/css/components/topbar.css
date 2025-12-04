@@ -1,0 +1,385 @@
+﻿/**
+ * MOBIX - Topbar Component (Redesigned)
+ */
+
+.topbar {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 24px;
+  height: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .topbar {
+  background: #16213e;
+  border-bottom-color: #2d3a5c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* LEFT SIDE - LOGO */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* BACK BUTTON */
+.btn-back {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+body.dark-mode .btn-back {
+  background: #0f0f1e;
+  border-color: #2d3a5c;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: white;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-back.hidden {
+  display: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.logo-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.logo-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-name {
+  font-size: 26px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding-left: 12px;
+  border-left: 2px solid var(--gray-300);
+}
+
+body.dark-mode .brand-tagline {
+  color: rgba(255, 255, 255, 0.6);
+  border-left-color: #2d3a5c;
+}
+
+/* RIGHT SIDE - CONTROLS */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* PROFILE BUTTON */
+.btn-profile {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 21px;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.btn-profile .profile-text {
+  font-size: 14px;
+  font-weight: 600;
+  display: inline;
+}
+
+.btn-profile .profile-icon {
+  display: none;
+}
+
+.btn-profile.logged-in {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-profile.logged-in .profile-text {
+  display: none;
+}
+
+.btn-profile.logged-in .profile-icon {
+  display: none;
+}
+
+body.dark-mode .btn-profile {
+  background: #0f0f1e;
+  border-color: #2d3a5c;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-profile:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* THEME TOGGLE */
+.theme-toggle-wrapper {
+  position: relative;
+}
+
+.theme-toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.theme-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 34px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  overflow: hidden;
+}
+
+body.dark-mode .toggle-slider {
+  background: #2d3a5c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 26px;
+  width: 26px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle input:checked + .toggle-slider::before {
+  transform: translateX(28px);
+}
+
+.toggle-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  transition: all 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sun-icon {
+  left: 8px;
+  opacity: 1;
+}
+
+.moon-icon {
+  right: 8px;
+  opacity: 0;
+}
+
+.theme-toggle input:checked ~ .toggle-slider .sun-icon {
+  opacity: 0;
+}
+
+.theme-toggle input:checked ~ .toggle-slider .moon-icon {
+  opacity: 1;
+}
+
+.toggle-slider:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+body.dark-mode .toggle-slider:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* HAMBURGER BUTTON */
+.btn-hamburger {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+body.dark-mode .btn-hamburger {
+  background: #0f0f1e;
+  border-color: #2d3a5c;
+}
+
+.btn-hamburger:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .btn-hamburger span {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.btn-hamburger:hover span {
+  background: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 16px;
+    height: 64px;
+  }
+
+  .brand-tagline {
+    display: none;
+  }
+
+  .brand-name {
+    font-size: 22px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .btn-profile,
+  .btn-hamburger {
+    width: 38px;
+    height: 38px;
+  }
+
+  .btn-profile .profile-text {
+    display: none;
+  }
+
+  .btn-profile .profile-icon {
+    display: inline;
+  }
+
+  .btn-profile.logged-in .profile-icon {
+    display: none;
+  }
+
+  .theme-toggle {
+    width: 54px;
+    height: 28px;
+  }
+
+  .toggle-slider::before {
+    width: 22px;
+    height: 22px;
+  }
+
+  .theme-toggle input:checked + .toggle-slider::before {
+    transform: translateX(26px);
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-name {
+    font-size: 20px;
+  }
+}

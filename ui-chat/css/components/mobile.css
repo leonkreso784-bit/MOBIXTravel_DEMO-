@@ -1,0 +1,992 @@
+/**
+ * MOBIX - Mobile Responsive Styles
+ * Prilagodba za mobilne uređaje
+ */
+
+/* ========================================
+   GLOBAL MOBILE FIXES
+   ======================================== */
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+  button, 
+  .btn, 
+  a,
+  input[type="submit"],
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ========================================
+   TOPBAR MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 12px;
+    height: 60px;
+  }
+  
+  .topbar-left {
+    gap: 8px;
+  }
+  
+  .btn-back {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logo-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .brand-name {
+    font-size: 20px;
+  }
+  
+  .brand-tagline {
+    display: none;
+  }
+  
+  .topbar-right {
+    gap: 6px;
+  }
+  
+  .btn-profile {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  
+  .btn-profile .profile-text {
+    display: none;
+  }
+  
+  .btn-profile .profile-icon {
+    display: flex;
+  }
+  
+  .btn-hamburger {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .btn-hamburger span {
+    width: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0 10px;
+    height: 56px;
+  }
+  
+  .brand-name {
+    font-size: 18px;
+  }
+  
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ========================================
+   SIDEBAR MOBILE (hamburger menu)
+   ======================================== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 85%;
+    max-width: 320px;
+    right: -100%;
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  
+  .sidebar.active {
+    right: 0;
+  }
+  
+  .sidebar-nav {
+    padding: 16px;
+    gap: 10px;
+  }
+  
+  .sidebar-item {
+    padding: 14px 16px;
+    min-height: 52px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+}
+
+/* ========================================
+   HERO SCREEN MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .hero-screen {
+    padding-top: 60px;
+  }
+  
+  .hero-content {
+    padding: 40px 16px 30px;
+  }
+  
+  .hero-text-wrapper {
+    max-width: 100%;
+  }
+  
+  .hero-brand {
+    margin-bottom: 24px;
+  }
+  
+  .brand-welcome {
+    font-size: 14px;
+    letter-spacing: 1.5px;
+  }
+  
+  .hero-logo {
+    font-size: 42px;
+    letter-spacing: -1px;
+  }
+  
+  .hero-typing-container {
+    min-height: 50px;
+    margin-bottom: 30px;
+  }
+  
+  .typing-text,
+  .typing-cursor {
+    font-size: 18px;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    padding: 0 10px;
+  }
+  
+  .btn-hero {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+  
+  .features-section {
+    padding: 40px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-screen {
+    padding-top: 56px;
+  }
+  
+  .hero-logo {
+    font-size: 36px;
+  }
+  
+  .brand-welcome {
+    font-size: 12px;
+  }
+  
+  .typing-text,
+  .typing-cursor {
+    font-size: 16px;
+  }
+  
+  .btn-hero {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* ========================================
+   CHAT SCREEN MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .chat-screen {
+    height: calc(100vh - 60px);
+  }
+  
+  .chat-layout {
+    flex-direction: column;
+  }
+  
+  /* Chat Sidebar - becomes a collapsible panel */
+  .chat-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 60px;
+    width: 85%;
+    max-width: 300px;
+    height: calc(100vh - 60px);
+    z-index: 200;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .chat-sidebar.mobile-open {
+    left: 0;
+  }
+  
+  .chat-sidebar-header {
+    padding: 16px;
+  }
+  
+  .chat-sidebar-header h3 {
+    font-size: 16px;
+  }
+  
+  .btn-new-chat {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .chat-history-list {
+    padding: 10px;
+  }
+  
+  .chat-history-item {
+    padding: 10px;
+  }
+  
+  /* Chat Main */
+  .chat-main {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .chat-messages {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .message-content {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  /* Welcome message */
+  .welcome-message {
+    padding: 30px 16px;
+  }
+  
+  .welcome-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-message h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .welcome-message p {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  
+  .welcome-suggestions {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .suggestion-chip {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  
+  /* Chat Input */
+  .chat-input-area {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .chat-input {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 20px;
+  }
+  
+  .btn-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+  }
+  
+  .chat-input-hint {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-screen {
+    height: calc(100vh - 56px);
+  }
+  
+  .chat-sidebar {
+    top: 56px;
+    height: calc(100vh - 56px);
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .message-content {
+    max-width: 90%;
+    font-size: 14px;
+  }
+  
+  .welcome-message h2 {
+    font-size: 20px;
+  }
+  
+  .welcome-message p {
+    font-size: 14px;
+  }
+}
+
+/* Mobile Chat Sidebar Toggle Button */
+.btn-chat-history-toggle {
+  display: none;
+  position: fixed;
+  bottom: 100px;
+  left: 16px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  cursor: pointer;
+  z-index: 150;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .btn-chat-history-toggle {
+    display: flex;
+  }
+}
+
+/* Chat Sidebar Overlay */
+.chat-sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 60px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .chat-sidebar-overlay.active {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-sidebar-overlay {
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+}
+
+/* ========================================
+   PLANNER SCREEN MOBILE
+   ======================================== */
+@media (max-width: 900px) {
+  .planner-screen {
+    padding-top: 60px;
+  }
+  
+  .planner-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .planner-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  body.dark-mode .planner-sidebar {
+    border-bottom-color: #2d2d44;
+  }
+  
+  .planner-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 12px;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .itinerary-item {
+    min-width: 200px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  
+  .planner-content {
+    padding: 16px;
+  }
+  
+  .planner-editor-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .planner-editor-header h2 {
+    font-size: 20px;
+  }
+  
+  .planner-editor-actions {
+    width: 100%;
+  }
+  
+  .btn-save-itinerary {
+    flex: 1;
+  }
+  
+  .planner-form {
+    padding: 20px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* Generate Section */
+  .generate-section {
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .btn-generate {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+  
+  /* Options Grid - cards */
+  .options-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .planner-screen {
+    padding-top: 56px;
+  }
+  
+  .planner-layout {
+    min-height: calc(100vh - 56px);
+  }
+  
+  .planner-content {
+    padding: 12px;
+  }
+  
+  .planner-form {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+}
+
+/* ========================================
+   TRAVEL NOTE SCREEN MOBILE
+   ======================================== */
+@media (max-width: 900px) {
+  .travelnote-screen {
+    padding-top: 60px;
+  }
+  
+  .travelnote-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .travelnote-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  body.dark-mode .travelnote-sidebar {
+    border-bottom-color: #2d2d44;
+  }
+  
+  .travelnote-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 12px;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .note-list-item {
+    min-width: 180px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  
+  .travelnote-main {
+    flex: 1;
+    min-height: 400px;
+  }
+  
+  .note-editor-container {
+    padding: 16px;
+  }
+  
+  .note-editor-header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .note-title-input {
+    font-size: 18px;
+    width: 100%;
+  }
+  
+  .note-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .note-content-section,
+  .note-cards-section {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .note-content-textarea {
+    min-height: 150px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .travelnote-screen {
+    padding-top: 56px;
+  }
+  
+  .travelnote-layout {
+    min-height: calc(100vh - 56px);
+  }
+  
+  .note-editor-container {
+    padding: 12px;
+  }
+  
+  .note-title-input {
+    font-size: 16px;
+  }
+}
+
+/* ========================================
+   RESULT CARDS MOBILE (Chat & Planner)
+   ======================================== */
+@media (max-width: 768px) {
+  /* Card container in messages */
+  .message-content .card,
+  .option-card,
+  .result-card {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Card image */
+  .card-image,
+  .option-card-image {
+    height: 150px;
+  }
+  
+  /* Card content */
+  .card-content,
+  .option-card-content {
+    padding: 12px;
+  }
+  
+  .card-title,
+  .option-title {
+    font-size: 15px;
+  }
+  
+  .card-subtitle,
+  .option-subtitle {
+    font-size: 13px;
+  }
+  
+  .card-price,
+  .option-price {
+    font-size: 14px;
+  }
+  
+  /* Card actions */
+  .card-actions,
+  .option-card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .card-actions button,
+  .option-card-actions button {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
+/* ========================================
+   FULL CARDS IN TRAVEL NOTE (MOBILE)
+   ======================================== */
+@media (max-width: 768px) {
+  .tn-full-card {
+    width: 100%;
+  }
+  
+  .tn-full-card .tn-card-image {
+    height: 140px;
+  }
+  
+  .tn-full-card .tn-card-body {
+    padding: 12px;
+  }
+  
+  .tn-full-card .tn-card-title {
+    font-size: 15px;
+  }
+  
+  .tn-full-card .tn-card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tn-full-card .tn-card-actions button {
+    width: 100%;
+  }
+}
+
+/* ========================================
+   AUTH SCREENS MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .auth-modal {
+    width: 95%;
+    max-width: 400px;
+    padding: 24px 20px;
+    margin: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .auth-modal h2 {
+    font-size: 22px;
+  }
+  
+  .auth-input {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+  
+  .auth-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    padding: 30px 20px;
+  }
+}
+
+/* ========================================
+   PROFILE SCREEN MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .profile-screen {
+    padding-top: 60px;
+  }
+  
+  .profile-container {
+    padding: 20px 16px;
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .profile-name {
+    font-size: 22px;
+  }
+  
+  .profile-section {
+    padding: 16px;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .profile-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-screen {
+    padding-top: 56px;
+  }
+}
+
+/* ========================================
+   FEATURES SECTION MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .features-container {
+    padding: 0 16px;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .feature-card {
+    padding: 20px;
+  }
+  
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-title {
+    font-size: 18px;
+  }
+  
+  .feature-description {
+    font-size: 14px;
+  }
+}
+
+/* ========================================
+   ABOUT SECTION MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .about-screen {
+    padding-top: 60px;
+  }
+  
+  .about-content {
+    padding: 30px 16px;
+  }
+  
+  .about-title {
+    font-size: 28px;
+  }
+  
+  .about-description {
+    font-size: 15px;
+  }
+  
+  .about-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-screen {
+    padding-top: 56px;
+  }
+  
+  .about-title {
+    font-size: 24px;
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES FOR MOBILE
+   ======================================== */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .show-on-mobile {
+    display: block !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-center {
+    text-align: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  
+  .mobile-padding {
+    padding: 16px !important;
+  }
+  
+  .mobile-margin {
+    margin: 16px !important;
+  }
+}
+
+/* ========================================
+   SCROLLBAR STYLING (TOUCH DEVICES)
+   ======================================== */
+@media (max-width: 768px) {
+  /* Hide scrollbars but allow scrolling */
+  .chat-messages::-webkit-scrollbar,
+  .chat-sidebar::-webkit-scrollbar,
+  .planner-list::-webkit-scrollbar,
+  .travelnote-list::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  
+  .chat-messages,
+  .chat-sidebar,
+  .planner-list,
+  .travelnote-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ========================================
+   SAFE AREA INSETS (iPhone notch, etc.)
+   ======================================== */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .chat-input-area {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  
+  .sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  @media (max-width: 768px) {
+    .btn-chat-history-toggle {
+      bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* ========================================
+   LANDSCAPE ORIENTATION FIXES
+   ======================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-content {
+    padding: 20px 16px;
+  }
+  
+  .hero-logo {
+    font-size: 32px;
+  }
+  
+  .typing-text {
+    font-size: 16px;
+  }
+  
+  .hero-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .btn-hero {
+    flex: 1;
+    min-width: 140px;
+  }
+  
+  .welcome-message {
+    padding: 20px;
+  }
+  
+  .welcome-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .welcome-message h2 {
+    font-size: 20px;
+  }
+}
