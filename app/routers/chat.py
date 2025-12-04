@@ -361,36 +361,6 @@ async def chat(
         greeting_reply = await openai_client.chat(greeting_messages, language_tag, language_code, max_tokens=400)
         append_history(session_id, message, greeting_reply)
         return {"reply": greeting_reply, "intent": "GREETING"}
-    
-    # PROFILE_QUESTION - User asking about their profile (no CARD blocks)
-    from ..utils.intent import is_profile_question
-    if is_profile_question(message):
-        profile_messages: List[Dict[str, str]] = [
-            {
-                "role": "system",
-                "content": (
-                    f"You are MOBIX, a friendly travel assistant. Answer in {language_tag}. "
-                    f"User is asking about their profile/information YOU know about them. "
-                    f"Respond naturally and conversationally about what you know from their profile. "
-                    f"Be friendly and concise (2-4 sentences). Use emojis sparingly for warmth. "
-                    f"If profile is empty/limited, acknowledge this politely."
-                ),
-            }
-        ]
-        
-        # Add user profile context
-        if profile:
-            profile_messages.append({"role": "system", "content": f"USER_PROFILE: {json.dumps(profile, ensure_ascii=False)}"})
-        else:
-            profile_messages.append({"role": "system", "content": "USER_PROFILE: No profile data available yet."})
-        
-        profile_messages.extend(history[-5:])
-        profile_messages.append({"role": "user", "content": message})
-        
-        ai_reply = await openai_client.chat(profile_messages, language_tag, language_code, max_tokens=600)
-        
-        append_history(session_id, message, ai_reply)
-        return {"reply": ai_reply, "intent": "PROFILE_QUESTION"}
 
     travel_request = detect_travel_request(message) or {}
     
@@ -403,20 +373,33 @@ async def chat(
     intent_type = await intent_detector.classify(message, history, language_tag)
     print(f"[MOBIX DEBUG] Message: '{message[:50]}...' -> Intent: {intent_type}")
     
-    # GENERAL_QUESTION - User asking general questions (no CARD blocks)
-    if intent_type == "GENERAL_QUESTION":
-        general_messages: List[Dict[str, str]] = [
+    # CHAT - Normal conversation, questions, recommendations, advice - GPT handles everything
+    if intent_type == "CHAT":
+        chat_messages: List[Dict[str, str]] = [
             {
                 "role": "system",
                 "content": (
-                    f"You are MOBIX, a friendly travel assistant. Answer in {language_tag}. "
-                    f"User is asking a general travel question. Provide helpful, accurate information. "
-                    f"Be concise but thorough (4-6 sentences max). Use emojis sparingly. "
-                    f"If you reference previous context (like 'that hotel' or 'the trip we discussed'), "
-                    f"use session memory. NO CARD BLOCKS - just conversational answer."
+                    f"You are MOBIX, a friendly and intelligent travel assistant chatbot. "
+                    f"RESPOND ONLY IN {language_tag}!\n\n"
+                    f"You can:\n"
+                    f"- Have normal conversations (who are you, how are you, what can you do)\n"
+                    f"- Give travel advice and destination recommendations\n"
+                    f"- Answer questions about travel, visas, weather, costs\n"
+                    f"- Help plan trips (ask user to specify: from where → to where)\n\n"
+                    f"RULES:\n"
+                    f"- Be friendly, helpful, and conversational\n"
+                    f"- Use 1-2 emojis per message for warmth\n"
+                    f"- Keep responses concise (3-6 sentences)\n"
+                    f"- If user asks about trips, ask them for departure and destination cities\n"
+                    f"- NEVER generate [CARD] blocks - that's only for PLAN_REQUEST\n"
+                    f"- If inappropriate content, politely redirect to travel topics"
                 ),
             }
         ]
+        
+        # Add user profile context if available
+        if profile:
+            chat_messages.append({"role": "system", "content": f"USER_PROFILE: {json.dumps(profile, ensure_ascii=False)}"})
         
         # Add session memory context for follow-up questions
         if session_memory:
@@ -426,15 +409,15 @@ async def chat(
             if session_memory.get("last_origin"):
                 context_parts.append(f"from {session_memory['last_origin']}")
             if context_parts:
-                general_messages.append({"role": "system", "content": f"CONTEXT: {' '.join(context_parts)}"})
+                chat_messages.append({"role": "system", "content": f"CONTEXT: {' '.join(context_parts)}"})
         
-        general_messages.extend(history[-8:])
-        general_messages.append({"role": "user", "content": message})
+        chat_messages.extend(history[-8:])
+        chat_messages.append({"role": "user", "content": message})
         
-        ai_reply = await openai_client.chat(general_messages, language_tag, language_code, max_tokens=1000)
+        ai_reply = await openai_client.chat(chat_messages, language_tag, language_code, max_tokens=1000)
         
         append_history(session_id, message, ai_reply)
-        return {"reply": ai_reply, "intent": "GENERAL_QUESTION"}
+        return {"reply": ai_reply, "intent": "CHAT"}
 
     # Use GPT to extract origin/destination for complex queries (e.g., "iz Omišlja na otoku Krku u Atenu")
     origin_hint = travel_request.get("origin")
@@ -463,18 +446,13 @@ async def chat(
         if not destination:
             destination = detect_destination(message)
         
-        # Only use memory for follow-up questions about existing PLAN_REQUEST, NOT for new advice/search queries
-        # This prevents "Kamo na skijanje?" from using Barcelona memory and becoming a PLAN_REQUEST
-        # Also prevents "Koliko dana trebam?" after TRAVEL_ADVICE from pulling old PLAN_REQUEST memory
+        # Only use memory for follow-up questions about existing PLAN_REQUEST
         last_intent = session_memory.get("last_plan_type")
         if not destination and session_memory.get("last_destination"):
-            # Only apply memory if:
-            # 1. Current intent is not TRAVEL_ADVICE or SPECIFIC_SEARCH (those are new queries), AND
-            # 2. Last intent was PLAN_REQUEST or QUESTION_ONLY (continuing a plan conversation)
-            if intent_type not in ("TRAVEL_ADVICE", "SPECIFIC_SEARCH"):
-                if last_intent in ("PLAN_REQUEST", "QUESTION_ONLY"):
-                    destination = session_memory.get("last_destination")
-                    origin_hint = origin_hint or session_memory.get("last_origin")
+            # Only apply memory if last intent was PLAN_REQUEST (continuing a plan conversation)
+            if last_intent == "PLAN_REQUEST":
+                destination = session_memory.get("last_destination")
+                origin_hint = origin_hint or session_memory.get("last_origin")
     
     origin_city = normalize_croatian_city(origin_hint) if origin_hint else None
     destination_city = normalize_croatian_city(destination) if destination else None
@@ -495,7 +473,7 @@ async def chat(
     # Only override intent if we have BOTH cities AND intent is not already special type
     # This prevents "Guten Tag" from becoming PLAN_REQUEST when detected as greeting
     # Also prevents "What can you do" from becoming PLAN_REQUEST if it accidentally parsed cities
-    if origin_city and destination_city and intent_type not in ("GREETING", "PROFILE_QUESTION", "GENERAL_QUESTION"):
+    if origin_city and destination_city and intent_type not in ("GREETING", "CHAT"):
         intent_type = "PLAN_REQUEST"
     if interest_tag:
         preferences = list(travel_context.get("preferences") or [])
@@ -503,48 +481,6 @@ async def chat(
             preferences.append(interest_tag)
             travel_context["preferences"] = preferences
     google_key = (os.getenv("GOOGLE_API_KEY") or "").strip()
-
-    # Build search results for SPECIFIC_SEARCH but let GPT explain WHY
-    search_results = None
-    if intent_type == "SPECIFIC_SEARCH":
-        category = detect_category(message)
-        # Try to extract city from message, fallback to context
-        city = destination_city or origin_city or ""
-        # If no city detected, try to extract from message patterns like "u Budimpesti", "in Paris"
-        if not city:
-            import re
-            from ..utils.intent import NOT_CITY_WORDS
-            city_patterns = [
-                r'\bu\s+([A-ZČĆŠĐŽ][a-zčćšđžA-ZČĆŠĐŽ]+)',  # "u Budimpesti" - must start with capital
-                r'\bin\s+([A-Z][a-zA-Z]+)',  # "in Paris" - must start with capital
-                r'\bà\s+([A-Z][a-zA-Z]+)',  # "à Paris"
-                r'\ben\s+([A-Z][a-zA-Z]+)',  # "en Madrid"
-            ]
-            for pattern in city_patterns:
-                match = re.search(pattern, message)
-                if match:
-                    candidate = match.group(1)
-                    # Make sure it's not a blacklisted word
-                    if candidate.lower() not in NOT_CITY_WORDS:
-                        city = candidate.title()
-                        break
-        
-        # IMPORTANT: Only search for places if we have a REAL city
-        # Without a real city, we would get irrelevant default results
-        if city:
-            places = await search_places(
-                get_category_query(category),
-                city,
-                language_code=language_code,
-                google_key=google_key,
-            )
-            # Store results to append after GPT response
-            search_results = {
-                "category": category,
-                "city": city,
-                "places": places
-            }
-        # If no city, search_results stays None and no cards will be added
 
     travel_bundle = None
     return_bundle = None  # For round trips
@@ -576,7 +512,6 @@ async def chat(
             destination_city = session_memory.get("last_origin")
     
     # Only build travel bundle for PLAN_REQUEST with clear destination
-    # TRAVEL_ADVICE should give suggestions, not full plans
     if intent_type == "PLAN_REQUEST" and origin_city and destination_city:
         # Check if this is a return trip request
         if is_return_request and not is_round_trip:
@@ -815,66 +750,11 @@ async def chat(
                     f"Suggest car or bus as primary options."
                 )})
     
-    if search_results:
-        # Add search results for SPECIFIC_SEARCH so GPT can explain WHY each place
-        places_summary = json.dumps([{
-            "name": p.get("name"),
-            "rating": p.get("rating"),
-            "address": p.get("address")
-        } for p in search_results["places"][:5]], ensure_ascii=False)
-        messages.append({"role": "system", "content": f"SEARCH_RESULTS: Found {len(search_results['places'])} {search_results['category']} in {search_results['city']}. Top places: {places_summary}. YOU MUST write 2-3 sentences WHY EACH place is recommended BEFORE the backend adds structured data."})
-    
-    if intent_type == "TRAVEL_ADVICE":
-        # CRITICAL: User is asking WHERE to go, not HOW to get there
-        # Provide 3-5 destination recommendations with detailed explanations
-        advice_context = build_advice_context(profile, origin_city, destination_city)
-        
-        # Add seasonal and budget context
-        from datetime import datetime
-        current_month = datetime.now().month
-        season = "winter" if current_month in [12, 1, 2] else "spring" if current_month in [3, 4, 5] else "summer" if current_month in [6, 7, 8] else "autumn"
-        
-        # Build context about WHERE user is asking from
-        user_location_context = ""
-        if origin_city or profile.get("home_city"):
-            user_home = origin_city or profile.get("home_city")
-            user_location_context = f"User lives in/is from: {user_home}. "
-            # Check if asking for domestic recommendations
-            domestic_keywords = ["inside my country", "within", "u hrvatskoj", "po hrvatskoj", "domestic", "vikend", "weekend getaway"]
-            is_domestic_request = any(kw in message.lower() for kw in domestic_keywords)
-            if is_domestic_request:
-                user_location_context += f"User wants DOMESTIC recommendations (within same country as {user_home}). DO NOT recommend {user_home} or nearby towns - they already live there! "
-        
-        messages.append({"role": "system", "content": (
-            f"TRAVEL_ADVICE_MODE: User is asking for destination recommendations (WHERE to go).\n"
-            f"Context: {user_location_context}{advice_context if advice_context else 'User location unknown'}\n"
-            f"Current season: {season} - Recommend destinations that are BEST in this season!\n\n"
-            f"YOUR TASK:\n"
-            f"1. Suggest 3-5 specific cities/destinations perfect for their request AND current season\n"
-            f"2. For EACH destination, write a detailed paragraph (4-5 sentences) explaining:\n"
-            f"   - WHY this destination is perfect for them RIGHT NOW (seasonal considerations)\n"
-            f"   - What makes it special/unique (cultural, natural, urban attractions)\n"
-            f"   - Best things to do there (mix of must-sees and hidden gems)\n"
-            f"   - Approximate budget range (transportation + accommodation + daily expenses)\n"
-            f"   - INSIDER TIP: One local secret or travel hack for this destination\n"
-            f"3. Consider user's profile: age, interests, budget level, travel frequency\n"
-            f"4. Use enthusiastic, engaging language in {language_tag}\n"
-            f"5. Add emojis for visual appeal: 🏖️ beach, 🏔️ mountains, 🏛️ culture, 🍷 food, 🎭 events\n"
-            f"6. After suggestions, ask which destination interests them most\n\n"
-            f"QUALITY STANDARDS:\n"
-            f"- Only recommend places you're confident about with accurate info\n"
-            f"- Include mix of popular and off-the-beaten-path destinations\n"
-            f"- Be realistic about costs - don't lowball budget estimates\n"
-            f"- Mention any visa requirements, safety concerns, or travel restrictions\n"
-            f"- If user wants domestic recommendations, suggest places WITHIN their country but FAR from home\n\n"
-            f"DO NOT provide travel plans, routes, transportation details, or CARD blocks - just recommend destinations with compelling reasons!"
-        )})
-    
     messages.extend(history[-8:])
     messages.append({"role": "user", "content": message})
 
-    # Increase max_tokens for PLAN_REQUEST and TRAVEL_ADVICE to allow full explanations
-    max_tokens = 2500 if intent_type in ("PLAN_REQUEST", "TRAVEL_ADVICE") else 1800
+    # Increase max_tokens for PLAN_REQUEST to allow full explanations
+    max_tokens = 2500 if intent_type == "PLAN_REQUEST" else 1800
     ai_reply = await openai_client.chat(messages, language_tag, language_code, max_tokens=max_tokens)
     
     # Clean up asterisks from GPT output (** and ***)
@@ -899,36 +779,13 @@ async def chat(
             return_plan_text = format_travel_plan(return_bundle, language_code)
             ai_reply = f"{ai_reply}{header}{return_plan_text}".strip()
         
-        # Track last destination for follow-up questions like "Koliko to košta?"
+        # Track last destination for follow-up questions
         if destination_city:
             update_memory(session_id, {
                 "last_destination": destination_city,
                 "last_origin": origin_city or "",
                 "last_plan_type": intent_type
             })
-    elif search_results and intent_type == "SPECIFIC_SEARCH":
-        # Specific search: Append CARD blocks with Google Maps links and Add to Planner buttons
-        category = search_results.get("category", "places")
-        city = search_results.get("city", "")
-        places = search_results.get("places", [])
-        
-        # Generate card blocks for frontend to display with proper icons and links
-        from ..utils.formatters import cards_from_places
-        category_card_type = get_category_card_type(category)
-        cards_text = cards_from_places(category_card_type, city, places)
-        
-        if cards_text:
-            # Append cards after GPT's explanation
-            ai_reply += "\n\n" + cards_text
-    
-    # Clear destination context for advice/search queries
-    if intent_type in ["TRAVEL_ADVICE", "SPECIFIC_SEARCH"]:
-        # Clear previous destination context when giving new advice
-        update_memory(session_id, {
-            "last_destination": None,
-            "last_origin": None,
-            "last_plan_type": intent_type  # Update to current intent type
-        })
 
     append_history(session_id, message, ai_reply)
     return {"reply": ai_reply, "intent": intent_type}

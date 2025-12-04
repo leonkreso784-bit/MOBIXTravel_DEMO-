@@ -13,11 +13,11 @@ except ImportError:  # pragma: no cover
 from .openai_client import OpenAIClient
 
 GREETING_PHRASES = {
-    # Croatian
+    # Croatian - ONLY pure greetings
     "pozdrav", "bok", "cao", "ćao", "hej", "zdravo", "dobar dan", "dobro jutro", "dobra večer",
     # Slovenian
     "živjo", "zivjo", "dober dan", "dobro jutro",
-    # English
+    # English - ONLY pure greetings
     "hello", "hi", "hey", "greetings", "good morning", "good afternoon", "good evening",
     # Spanish
     "hola", "buenos dias", "buenos días", "buenas tardes", "buenas noches",
@@ -31,36 +31,8 @@ GREETING_PHRASES = {
     "привіт", "привітання", "вітаю", "доброго дня", "добрий день",
 }
 
-# Small talk phrases (casual conversation, not travel-related)
-SMALL_TALK_PHRASES = {
-    # English
-    "how are you", "how r u", "how's it going", "what's up", "whats up",
-    "what are you doing", "who are you", "what is your name", "what's your name",
-    "nice to meet you", "pleased to meet you", "how do you do",
-    "good to see you", "long time no see", "thank you", "thanks",
-    "bye", "goodbye", "see you", "see ya", "take care", "have a nice day",
-    # Croatian
-    "kako si", "kako ste", "što ima", "šta ima", "sta ima", "sto ima",
-    "tko si", "ko si", "tko si ti", "ko si ti", "kako se zoveš", "kako se zoves",
-    "drago mi je", "hvala", "hvala ti", "hvala vam", "fala",
-    "doviđenja", "dovidenja", "bok", "ćao", "vidimo se", "čujemo se",
-    # German
-    "wie geht es dir", "wie gehts", "wie geht's", "was machst du",
-    "wer bist du", "wie heißt du", "wie heisst du", "freut mich",
-    "danke", "danke schön", "tschüss", "tschuss", "auf wiedersehen",
-    # Spanish
-    "cómo estás", "como estas", "qué tal", "que tal", "qué haces", "que haces",
-    "quién eres", "quien eres", "cómo te llamas", "como te llamas",
-    "mucho gusto", "gracias", "adiós", "adios", "hasta luego",
-    # French
-    "comment ça va", "comment ca va", "ça va", "ca va", "quoi de neuf",
-    "qui es-tu", "qui es tu", "comment tu t'appelles", "enchanté", "enchante",
-    "merci", "au revoir", "à bientôt", "a bientot",
-    # Italian
-    "come stai", "come va", "che fai", "cosa fai",
-    "chi sei", "come ti chiami", "piacere",
-    "grazie", "arrivederci", "a presto",
-}
+# REMOVED SMALL_TALK_PHRASES - these should go to GPT for natural responses
+# Questions like "how are you", "who are you", "thanks" need intelligent responses
 
 TRAVEL_KEYWORDS = {
     "putovanje",
@@ -290,39 +262,26 @@ ROUTE_HINT_TOKENS = (
 )
 
 
-def is_small_talk(message: str) -> bool:
-    """Check if message is casual small talk (how are you, what's up, etc.)."""
-    text = (message or "").strip().lower()
-    # Remove common punctuation
-    text = text.rstrip("!?.,:;")
-    
-    # Check exact match
-    if text in SMALL_TALK_PHRASES:
-        return True
-    
-    # Check if any small talk phrase is contained in the message
-    for phrase in SMALL_TALK_PHRASES:
-        if phrase in text:
-            return True
-    
-    return False
-
-
 def is_greeting(message: str) -> bool:
-    """Check if message is a greeting or small talk. Strips punctuation and checks normalized lowercase."""
+    """
+    Check if message is a PURE greeting (hello, bok, hola, etc.).
+    
+    IMPORTANT: This should ONLY match simple greetings, NOT:
+    - Questions (how are you, who are you, what can you do)
+    - Thanks (hvala, thanks, gracias)
+    - Goodbyes (bye, doviđenja)
+    
+    Those should go to GPT for natural, intelligent responses.
+    """
     text = (message or "").strip().lower()
     # Remove common punctuation
     text = text.rstrip("!?.,:;")
     
-    # Check exact match for greetings first
+    # Check exact match for pure greetings
     if text in GREETING_PHRASES:
         return True
     
-    # Check small talk phrases (how are you, what's up, etc.)
-    if is_small_talk(text):
-        return True
-    
-    # Check if message is ONLY a greeting (no other words)
+    # Check if message is ONLY a greeting word (no other words)
     # This catches variations like "Hello!" or "Bok!!!"
     words = text.split()
     if len(words) == 1:
@@ -335,34 +294,19 @@ def is_greeting(message: str) -> bool:
         phrase = " ".join(words)
         if phrase in GREETING_PHRASES:
             return True
-        # Also check without first word's punctuation
+        # Also check without punctuation
         phrase_clean = words[0].rstrip("!?.,:;") + " " + words[1].rstrip("!?.,:;")
         if phrase_clean in GREETING_PHRASES:
             return True
     
-    # Check 3-word phrases like "how are you", "what's going on"
-    if len(words) == 3:
-        phrase = " ".join(words)
-        if phrase in SMALL_TALK_PHRASES or phrase in GREETING_PHRASES:
-            return True
-    
-    # Check 4-word phrases like "nice to meet you", "how do you do"
-    if len(words) == 4:
-        phrase = " ".join(words)
-        if phrase in SMALL_TALK_PHRASES or phrase in GREETING_PHRASES:
-            return True
-    
-    # IMPORTANT: If message starts with greeting BUT contains travel keywords, it's NOT just a greeting
+    # IMPORTANT: If message starts with greeting BUT contains more content, let GPT handle it
     # Example: "Pozdrav treba mi plan putovanja..." → NOT a greeting (it's a travel request)
-    if len(words) > 4:
+    # Example: "Hello, how are you?" → NOT a pure greeting (needs GPT response)
+    if len(words) > 2:
         first_word = words[0].rstrip("!?.,:;")
         if first_word in GREETING_PHRASES:
-            # Check if rest of message contains travel keywords
-            rest_of_message = " ".join(words[1:])
-            if message_contains_travel_keywords(rest_of_message) or is_asking_for_advice(rest_of_message):
-                return False  # Not just a greeting, it's a travel request
-            # Otherwise it's just a polite greeting with context
-            return True
+            # This is a greeting + something else - let GPT handle it naturally
+            return False
     
     return False
 
@@ -531,15 +475,18 @@ class IntentDetector:
         self.client = client
 
     async def classify(self, message: str, history: List[Dict[str, str]], language_tag: str) -> str:
-        # PRIORITY 1: Check if it's a greeting FIRST (before route detection)
+        """
+        SIMPLIFIED INTENT DETECTION - Only 3 categories:
+        1. GREETING - Pure greetings (bok, hello, hi)
+        2. PLAN_REQUEST - Has origin + destination for travel planning
+        3. CHAT - Everything else goes to GPT for intelligent response
+        """
+        
+        # PRIORITY 1: Check if it's a greeting
         if is_greeting(message):
             return "GREETING"
         
-        # PRIORITY 2: Check if user is asking about their profile
-        if is_profile_question(message):
-            return "PROFILE_QUESTION"
-        
-        # PRIORITY 3: Check for PLAN_REQUEST with explicit route FIRST
+        # PRIORITY 2: Check for PLAN_REQUEST with explicit route
         # "Planiram putovanje iz Lisabona u Madrid" → PLAN_REQUEST
         # "I want to travel from Vienna to Prague" → PLAN_REQUEST
         route_signals = _extract_route_signals(message)
@@ -554,29 +501,11 @@ class IntentDetector:
         if _has_plan_trigger(message) and (origin or destination):
             return "PLAN_REQUEST"
         
-        # PRIORITY 4: Check SPECIFIC_SEARCH FIRST if there's a concrete city
-        # "Trebam hotel u Splitu" → SPECIFIC_SEARCH (has specific city Split!)
-        # "restorani u Opatiji" → SPECIFIC_SEARCH
-        # This must come BEFORE TRAVEL_ADVICE to handle "trebam hotel u Splitu"
-        if is_specific_search(message):
-            return "SPECIFIC_SEARCH"
-        
-        # PRIORITY 5: Check if user is asking for ADVICE (generic location requests)
-        # "topla mjesta u Europi" → TRAVEL_ADVICE (no specific city)
-        # "golf tereni u toplijim krajevima" → TRAVEL_ADVICE (no specific city)
-        # This comes AFTER specific_search - if no concrete city found, it's advice
-        if is_asking_for_advice(message):
-            return "TRAVEL_ADVICE"
-        
-        # PRIORITY 6: Check if user is asking general question (not travel plan)
-        # Example: "Koliko košta hotel?", "Kakvo je vrijeme?", "Trebam li vizu?"
-        if is_general_question(message):
-            return "GENERAL_QUESTION"
-        
-        # PRIORITY 7: Explicit plan trigger without locations → plan request (will need to ask for locations)
+        # Explicit plan trigger without locations → still plan request (will ask for details)
         if _has_plan_trigger(message):
             return "PLAN_REQUEST"
         
-        # Otherwise, let GPT classify (handles edge cases)
-        intent = await self.client.classify_intent(message, history, language_tag)
-        return intent
+        # EVERYTHING ELSE → CHAT (GPT handles it intelligently)
+        # This includes: "tko si ti", "što radiš", "kako si", travel advice, 
+        # recommendations, general questions, etc.
+        return "CHAT"
