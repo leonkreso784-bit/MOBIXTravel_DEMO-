@@ -184,15 +184,19 @@ def extract_city_from_message(message: str) -> Optional[str]:
         "sinju": "sinj", "vukovaru": "vukovar", "vinkovcima": "vinkovci", "kninu": "knin",
     }
     
-    # First try to find a known Croatian city (with normalization)
-    for city in CROATIAN_CITIES:
-        if city.lower() in msg:
-            return city.title()
-    
-    # Check for declensions
+    # FIRST: Check for declensions (more specific matches first)
     for declension, nominativ in CITY_NORMALIZATION.items():
         if declension in msg:
             return nominativ.title()
+    
+    # SECOND: Try to find a known Croatian city (exact word boundary match)
+    # Sort cities by length (longest first) to avoid partial matches like "bol" in "najbolje"
+    sorted_cities = sorted(CROATIAN_CITIES, key=len, reverse=True)
+    for city in sorted_cities:
+        # Use word boundary check to avoid matching "bol" in "najbolje"
+        pattern = r'\b' + re.escape(city.lower()) + r'\b'
+        if re.search(pattern, msg):
+            return city.title()
     
     # Try regex patterns
     for pattern in LOCATION_QUERY_PATTERNS:
