@@ -1,6 +1,6 @@
 /**
  * MOBIX - Mobile Responsive Styles
- * Prilagodba za mobilne uređaje
+ * Prilagodba za mobilne uređaje + iPhone optimizacija
  */
 
 /* ========================================
@@ -10,6 +10,16 @@
 /* Prevent horizontal scroll */
 html, body {
   overflow-x: hidden;
+  /* iOS Safari smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS Safe Area support */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* Touch-friendly tap targets */
@@ -21,6 +31,8 @@ html, body {
   .clickable {
     min-height: 44px;
     min-width: 44px;
+    /* iOS tap highlight */
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -143,12 +155,17 @@ html, body {
 }
 
 /* ========================================
-   HERO SCREEN MOBILE
+   HERO SCREEN MOBILE + iPHONE OPTIMIZACIJA
    ======================================== */
 
 /* Hide video play button and controls on all devices */
 .hero-video {
   pointer-events: none;
+  /* iOS hardware acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .hero-video::-webkit-media-controls {
@@ -189,40 +206,52 @@ video::-webkit-media-controls-start-playback-button {
   height: 0;
 }
 
+/* ========================================
+   iPHONE SPECIFIC - HERO BACKGROUND FIX
+   ======================================== */
+
+/* Na mobilnim uređajima - uvijek prikaži fallback sliku */
 @media (max-width: 768px) {
-  .hero-screen {
-    padding-top: 60px;
+  /* Forsiraj fallback sliku na mobilnim uređajima */
+  .hero-screen::before {
+    opacity: 1 !important;
+    background-image: url('https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1280');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: scroll; /* scroll umjesto fixed za iOS */
   }
   
-  /* Video background improvements for mobile */
+  /* Sakrij video na mobilnim da štedi bateriju */
   .hero-video-container {
+    display: none;
+  }
+  
+  .hero-screen {
+    padding-top: 60px;
+    /* Garantiraj da se vidi pozadina */
+    background: none !important;
+  }
+  
+  /* Overlay za čitljivost teksta */
+  .hero-video-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-  }
-  
-  .hero-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    pointer-events: none;
-  }
-  
-  /* Stronger overlay on mobile for better text readability */
-  .hero-video-overlay {
     background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
-      rgba(0, 0, 0, 0.7) 100%
+      180deg,
+      rgba(15, 12, 41, 0.7) 0%,
+      rgba(26, 26, 46, 0.75) 50%,
+      rgba(22, 33, 62, 0.85) 100%
     ) !important;
+    z-index: 1;
   }
   
   .hero-content {
     padding: 40px 16px 30px;
+    position: relative;
+    z-index: 2;
   }
   
   .hero-text-wrapper {
@@ -236,11 +265,13 @@ video::-webkit-media-controls-start-playback-button {
   .brand-welcome {
     font-size: 14px;
     letter-spacing: 1.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
   
   .hero-logo {
     font-size: 42px;
     letter-spacing: -1px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.4);
   }
   
   .hero-typing-container {
@@ -251,6 +282,7 @@ video::-webkit-media-controls-start-playback-button {
   .typing-text,
   .typing-cursor {
     font-size: 18px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
   }
   
   .hero-actions {
@@ -266,7 +298,10 @@ video::-webkit-media-controls-start-playback-button {
     padding: 14px 24px;
     font-size: 15px;
     border-radius: 14px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    /* iOS optimizacija */
+    -webkit-appearance: none;
+    appearance: none;
   }
   
   .btn-primary {
@@ -274,29 +309,38 @@ video::-webkit-media-controls-start-playback-button {
   }
   
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
   
   .features-section {
     padding: 40px 16px;
+    position: relative;
+    z-index: 2;
   }
 }
 
+/* ========================================
+   iPHONE SE, iPHONE 12 mini (mali ekrani)
+   ======================================== */
 @media (max-width: 480px) {
   .hero-screen {
     padding-top: 56px;
   }
   
-  /* Even stronger overlay on small phones */
+  .hero-screen::before {
+    background-image: url('https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=800');
+  }
+  
+  /* Jači overlay za manje ekrane */
   .hero-video-overlay {
     background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.55) 0%,
-      rgba(0, 0, 0, 0.65) 50%,
-      rgba(0, 0, 0, 0.75) 100%
+      180deg,
+      rgba(15, 12, 41, 0.75) 0%,
+      rgba(26, 26, 46, 0.8) 50%,
+      rgba(22, 33, 62, 0.9) 100%
     ) !important;
   }
   
@@ -362,6 +406,72 @@ video::-webkit-media-controls-start-playback-button {
   
   .feature-desc {
     font-size: 12px;
+  }
+}
+
+/* ========================================
+   iPHONE NOTCH (safe area)
+   ======================================== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media (max-width: 768px) {
+    .topbar {
+      padding-top: env(safe-area-inset-top);
+      height: calc(60px + env(safe-area-inset-top));
+    }
+    
+    .hero-screen {
+      padding-top: calc(60px + env(safe-area-inset-top));
+    }
+    
+    .chat-screen {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .chat-input-area {
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* ========================================
+   iPHONE LANDSCAPE MODE
+   ======================================== */
+@media (max-width: 896px) and (orientation: landscape) {
+  .hero-screen {
+    min-height: 100vh;
+    padding-top: 50px;
+  }
+  
+  .hero-content {
+    padding: 20px 40px;
+  }
+  
+  .hero-logo {
+    font-size: 32px;
+  }
+  
+  .hero-typing-container {
+    min-height: 40px;
+    margin-bottom: 20px;
+  }
+  
+  .typing-text {
+    font-size: 16px;
+  }
+  
+  .hero-actions {
+    flex-direction: row;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .btn-hero {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .features-section {
+    padding: 20px;
   }
 }
 

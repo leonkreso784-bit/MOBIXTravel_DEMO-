@@ -8,8 +8,32 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  /* FALLBACK gradient ako video ne radi */
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0c29 100%);
   padding-top: 70px;
+}
+
+/* Fallback background image kada video ne radi (posebno za iOS) */
+.hero-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Pokazuje sliku ako video ne radi */
+.hero-screen.video-failed::before,
+.hero-screen.show-fallback::before {
+  opacity: 1;
 }
 
 /* Video Background */
@@ -27,6 +51,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* iOS optimizacija */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .hero-video-overlay {

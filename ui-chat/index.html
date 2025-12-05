@@ -2,9 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- iOS Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MOBIX Travel">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#1a1a2e">
+  
   <title>MOBIX - AI Travel Chatbot</title>
   <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Preload hero background image for faster mobile loading -->
+  <link rel="preload" href="https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1280" as="image">
 </head>
 <body class="dark-mode">
   <!-- TOPBAR -->
@@ -92,9 +105,20 @@
   <div id="heroScreen" class="screen hero-screen">
     <!-- Video Background -->
     <div class="hero-video-container">
-      <video autoplay muted loop playsinline disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" class="hero-video" poster="https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1920">
+      <video 
+        id="heroVideo"
+        autoplay 
+        muted 
+        loop 
+        playsinline 
+        webkit-playsinline
+        disablePictureInPicture 
+        controlsList="nodownload nofullscreen noremoteplayback" 
+        class="hero-video" 
+        poster="https://images.pexels.com/photos/2325446/pexels-photo-2325446.jpeg?auto=compress&cs=tinysrgb&w=1920"
+        preload="auto"
+      >
         <source src="https://cdn.coverr.co/videos/coverr-flying-over-italian-coast/1080p.mp4" type="video/mp4">
-        <source src="https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
       </video>
       <div class="hero-video-overlay"></div>
     </div>

@@ -31,6 +31,9 @@ class MobixApp {
 
       // Inicijaliziraj UI komponente
       this.initUIComponents();
+      
+      // Inicijaliziraj video pozadinu za iOS
+      this.initHeroVideo();
 
       // Prikaži hero screen
       navigator.showScreen('hero');
@@ -41,6 +44,50 @@ class MobixApp {
       console.error('MOBIX Init Failed:', error);
       ui.showNotification('Failed to initialize app', 'error');
     }
+  }
+  
+  initHeroVideo() {
+    const heroVideo = document.getElementById('heroVideo');
+    const heroScreen = document.getElementById('heroScreen');
+    
+    if (!heroVideo || !heroScreen) return;
+    
+    // Detektiraj iOS/mobilne uređaje
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Na mobilnim uređajima, odmah prikaži fallback sliku
+    if (isMobile) {
+      heroScreen.classList.add('show-fallback');
+      console.log('Mobile detected, showing fallback image');
+      return;
+    }
+    
+    // Video error handler za desktop
+    heroVideo.addEventListener('error', () => {
+      console.warn('Hero video failed to load, showing fallback');
+      heroScreen.classList.add('video-failed');
+    });
+    
+    // Ako video ne počne u 5 sekundi, prikaži fallback
+    const videoTimeout = setTimeout(() => {
+      if (heroVideo.readyState < 2) {
+        console.warn('Hero video timeout, showing fallback');
+        heroScreen.classList.add('video-failed');
+      }
+    }, 5000);
+    
+    // Očisti timeout ako se video učita
+    heroVideo.addEventListener('canplay', () => {
+      clearTimeout(videoTimeout);
+      heroScreen.classList.remove('video-failed', 'show-fallback');
+    });
+    
+    // Pokušaj pokrenuti video (iOS Safari)
+    heroVideo.play().catch(() => {
+      console.warn('Video autoplay blocked, showing fallback');
+      heroScreen.classList.add('video-failed');
+    });
   }
 
   setupEventListeners() {
