@@ -215,16 +215,15 @@ video::-webkit-media-controls-start-playback-button {
   /* Forsiraj fallback sliku na mobilnim uređajima - DIREKTNO na .hero-screen */
   .hero-screen {
     padding-top: 60px;
-    /* Direktna pozadinska slika umjesto ::before za bolju iOS kompatibilnost */
-    /* Smanjen opacity gradijenta da se slika bolje vidi */
+    /* Vertikalna slika Santorini - savršena za mobilne ekrane */
     background-image: 
       linear-gradient(
         180deg,
-        rgba(15, 12, 41, 0.4) 0%,
-        rgba(26, 26, 46, 0.45) 40%,
-        rgba(22, 33, 62, 0.55) 100%
+        rgba(15, 23, 42, 0.3) 0%,
+        rgba(30, 41, 59, 0.4) 50%,
+        rgba(15, 23, 42, 0.6) 100%
       ),
-      url('https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg?auto=compress&cs=tinysrgb&w=1280') !important;
+      url('https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&h=1200&fit=crop&q=80') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
@@ -326,16 +325,15 @@ video::-webkit-media-controls-start-playback-button {
 @media (max-width: 480px) {
   .hero-screen {
     padding-top: 56px;
-    /* Manja verzija slike za manje ekrane - brže učitavanje */
-    /* Smanjen opacity gradijenta da se slika bolje vidi */
+    /* Ista Santorini slika, manja rezolucija za brže učitavanje */
     background-image: 
       linear-gradient(
         180deg,
-        rgba(15, 12, 41, 0.35) 0%,
-        rgba(26, 26, 46, 0.4) 40%,
-        rgba(22, 33, 62, 0.5) 100%
+        rgba(15, 23, 42, 0.3) 0%,
+        rgba(30, 41, 59, 0.4) 50%,
+        rgba(15, 23, 42, 0.6) 100%
       ),
-      url('https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg?auto=compress&cs=tinysrgb&w=800') !important;
+      url('https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&h=900&fit=crop&q=80') !important;
   }
   
   .hero-content {
