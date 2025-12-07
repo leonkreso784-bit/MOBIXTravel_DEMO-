@@ -158,7 +158,7 @@ async def search_hotels(
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": key,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.googleMapsUri,places.location",
+            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.googleMapsUri,places.location,places.photos",
         }
         payload = {"textQuery": f"hotels in {destination}", "languageCode": "en"}
         
@@ -187,6 +187,15 @@ async def search_hotels(
                             else:
                                 maps_url = f"https://www.google.com/maps/search/?api=1&query={quote_plus(name + ' ' + destination)}"
                         
+                        # Get photo URL if available
+                        photo_url = None
+                        photos = place.get("photos", [])
+                        if photos and len(photos) > 0:
+                            photo_name = photos[0].get("name", "")
+                            if photo_name:
+                                # Google Places API v1 photo URL format
+                                photo_url = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=400&maxWidthPx=600&key={key}"
+                        
                         all_hotels.append(
                             {
                                 "name": name,
@@ -196,6 +205,7 @@ async def search_hotels(
                                 "price_note": "procjena" if price_level == "PRICE_LEVEL_UNSPECIFIED" else None,
                                 "link": maps_url,
                                 "source": "google",
+                                "image": photo_url,
                             }
                         )
                     if all_hotels:
