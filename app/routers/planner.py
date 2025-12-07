@@ -574,12 +574,8 @@ async def generate_travel_plan(request: PlannerRequest):
         ]
         
         for i, hotel in enumerate(real_hotels[:5]):
-            # Build Google Places photo URL if available
-            photo_url = None
-            if hotel.get("photos"):
-                photo_ref = hotel["photos"][0].get("photo_reference")
-                if photo_ref and google_key:
-                    photo_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo_ref}&key={google_key}"
+            # Get image URL - hotels.py now returns "image" field directly
+            photo_url = hotel.get("image")
             
             hotel_options.append({
                 "id": f"hotel_{i+1}",
