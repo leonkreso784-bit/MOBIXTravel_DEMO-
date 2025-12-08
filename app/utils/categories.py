@@ -64,6 +64,34 @@ CROATIAN_CITIES = [
     "omišalj", "malinska", "njivice", "baška", "vrbnik", "punat", "kornić", "dobrinj",
 ]
 
+# International cities for Google Places search
+INTERNATIONAL_CITIES = [
+    # Europe
+    "paris", "london", "rome", "roma", "berlin", "madrid", "barcelona", "amsterdam",
+    "prague", "vienna", "wien", "budapest", "lisbon", "lisboa", "athens", "atena",
+    "munich", "münchen", "milan", "milano", "venice", "venezia", "florence", "firenze",
+    "brussels", "bruxelles", "zurich", "zürich", "geneva", "stockholm", "oslo", "copenhagen",
+    "dublin", "edinburgh", "manchester", "liverpool", "nice", "marseille", "lyon",
+    "monaco", "santorini", "mykonos", "crete", "rhodes", "corfu", "porto", "seville",
+    "valencia", "malaga", "ibiza", "mallorca", "palma", "cannes", "monte carlo",
+    # Balkans
+    "belgrade", "beograd", "sarajevo", "ljubljana", "skopje", "podgorica", "tirana",
+    "sofia", "bucharest", "bucuresti", "thessaloniki", "solun",
+    # Americas
+    "new york", "los angeles", "miami", "chicago", "san francisco", "las vegas",
+    "boston", "washington", "seattle", "toronto", "vancouver", "montreal",
+    "mexico city", "cancun", "rio de janeiro", "sao paulo", "buenos aires",
+    # Asia & Middle East
+    "tokyo", "kyoto", "osaka", "seoul", "beijing", "shanghai", "hong kong",
+    "singapore", "bangkok", "bali", "phuket", "dubai", "abu dhabi", "istanbul",
+    "tel aviv", "jerusalem", "mumbai", "delhi", "goa",
+    # Oceania & Africa
+    "sydney", "melbourne", "auckland", "cape town", "marrakech", "cairo",
+]
+
+# Combined list for all city searches
+ALL_CITIES = CROATIAN_CITIES + INTERNATIONAL_CITIES
+
 # Patterns to detect location queries in messages
 LOCATION_QUERY_PATTERNS = [
     # Croatian patterns
@@ -154,8 +182,8 @@ def is_location_query(message: str) -> bool:
     
     has_place_keyword = any(kw in msg for kw in place_keywords)
     
-    # Check for city names
-    has_city = any(city.lower() in msg for city in CROATIAN_CITIES)
+    # Check for city names (both Croatian and international)
+    has_city = any(city.lower() in msg for city in ALL_CITIES)
     
     # Also check for location prepositions with question words
     location_phrases = [
@@ -189,9 +217,9 @@ def extract_city_from_message(message: str) -> Optional[str]:
         if declension in msg:
             return nominativ.title()
     
-    # SECOND: Try to find a known Croatian city (exact word boundary match)
+    # SECOND: Try to find a known city (exact word boundary match)
     # Sort cities by length (longest first) to avoid partial matches like "bol" in "najbolje"
-    sorted_cities = sorted(CROATIAN_CITIES, key=len, reverse=True)
+    sorted_cities = sorted(ALL_CITIES, key=len, reverse=True)
     for city in sorted_cities:
         # Use word boundary check to avoid matching "bol" in "najbolje"
         pattern = r'\b' + re.escape(city.lower()) + r'\b'
