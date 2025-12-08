@@ -31,38 +31,62 @@ if env_path.exists():
 else:
     print(f"[MOBIX] No .env file found (using system environment variables)")
 
-# Debug: Print first 20 chars of API key on startup
-api_key = os.getenv("OPENAI_API_KEY", "")
+# Check API keys exist (don't log actual values!)
+api_key = os.getenv("OPENAI_API_KEY", "") or os.getenv("PENAI_API_KEY", "")
 if api_key:
-    print(f"[MOBIX] OpenAI API Key loaded: {api_key[:20]}...")
+    print("[MOBIX] ✅ OpenAI API Key configured")
 else:
-    print("[MOBIX] WARNING: No OpenAI API Key found!")
+    print("[MOBIX] ⚠️ WARNING: No OpenAI API Key found!")
 
-app = FastAPI(title="MOBIX Travel API", version="3.0")
-app.add_middleware(
-	CORSMiddleware,
-	allow_origins=os.getenv("CORS_ALLOW_ORIGINS", "*").split(","),
-	allow_methods=["*"],
-	allow_headers=["*"],
-	allow_credentials=True,
+# Security: Define allowed origins (restrict in production)
+ALLOWED_ORIGINS = [
+    "https://mobix-travel-demo.vercel.app",
+    "https://mobix-travel.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Use env var if set, otherwise use secure defaults
+cors_origins = os.getenv("CORS_ALLOW_ORIGINS", "").split(",")
+if cors_origins == [""]:
+    cors_origins = ALLOWED_ORIGINS
+
+app = FastAPI(
+    title="MOBIX Travel API", 
+    version="3.0",
+    docs_url=None,  # Disable Swagger docs in production
+    redoc_url=None,  # Disable ReDoc in production
 )
 
-@app.get("/api/debug/env")
-async def debug_env():
-	"""Debug endpoint to check environment variables."""
-	api_key = os.getenv("OPENAI_API_KEY", "")
-	google_key = os.getenv("GOOGLE_API_KEY", "")
-	return {
-		"openai_key_exists": bool(api_key),
-		"openai_key_first_20": api_key[:20] if api_key else "N/A",
-		"openai_key_length": len(api_key) if api_key else 0,
-		"google_key_exists": bool(google_key),
-		"model": os.getenv("OPENAI_MODEL", "not set"),
-	}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_methods=["GET", "POST", "OPTIONS"],  # Only needed methods
+    allow_headers=["Content-Type", "Authorization"],
+    allow_credentials=True,
+)
+
+# Security middleware for headers
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        # Security headers
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 @app.get("/api")
 async def api_info():
-	return {"status": "ok", "service": "MOBIX Travel"}
+    return {"status": "ok", "service": "MOBIX Travel"}
 
 app.include_router(chat_router)
 app.include_router(plan_router)

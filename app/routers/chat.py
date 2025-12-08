@@ -1,11 +1,13 @@
 import json
 import os
 import re
+import time
+from collections import defaultdict
 from typing import List, Dict, Any, Optional
 
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
 
 from ..utils.openai_client import OpenAIClient
@@ -47,10 +49,55 @@ router = APIRouter(prefix="/api", tags=["chat"])
 openai_client = OpenAIClient()
 intent_detector = IntentDetector(openai_client)
 
+# ============================================================
+# RATE LIMITING - Simple in-memory rate limiter
+# ============================================================
+RATE_LIMIT_REQUESTS = 30  # Max requests per window
+RATE_LIMIT_WINDOW = 60    # Window in seconds (1 minute)
+rate_limit_store: Dict[str, List[float]] = defaultdict(list)
+
+def check_rate_limit(client_id: str) -> bool:
+    """Check if client has exceeded rate limit. Returns True if allowed."""
+    now = time.time()
+    # Clean old entries
+    rate_limit_store[client_id] = [
+        t for t in rate_limit_store[client_id] 
+        if now - t < RATE_LIMIT_WINDOW
+    ]
+    # Check limit
+    if len(rate_limit_store[client_id]) >= RATE_LIMIT_REQUESTS:
+        return False
+    # Add current request
+    rate_limit_store[client_id].append(now)
+    return True
+
+# ============================================================
+# INPUT VALIDATION
+# ============================================================
+MAX_MESSAGE_LENGTH = 2000  # Max characters per message
+MAX_SESSION_ID_LENGTH = 100
 
 class ChatPayload(BaseModel):
     message: str
     session_id: str
+    
+    @validator('message')
+    def validate_message(cls, v):
+        if len(v) > MAX_MESSAGE_LENGTH:
+            raise ValueError(f'Message too long (max {MAX_MESSAGE_LENGTH} chars)')
+        # Remove potential script injections
+        v = re.sub(r'<script[^>]*>.*?</script>', '', v, flags=re.IGNORECASE | re.DOTALL)
+        v = re.sub(r'javascript:', '', v, flags=re.IGNORECASE)
+        return v.strip()
+    
+    @validator('session_id')
+    def validate_session_id(cls, v):
+        if len(v) > MAX_SESSION_ID_LENGTH:
+            raise ValueError('Invalid session ID')
+        # Only allow alphanumeric and hyphens
+        if not re.match(r'^[a-zA-Z0-9\-_]+$', v):
+            raise ValueError('Invalid session ID format')
+        return v.strip()
 
 
 class SessionMemoryPayload(BaseModel):
@@ -250,10 +297,19 @@ def is_round_trip_request(message: str) -> bool:
 
 @router.post("/chat")
 async def chat(
+    request: Request,
     payload: ChatPayload,
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
+    # Rate limiting by IP
+    client_ip = request.client.host if request.client else "unknown"
+    if not check_rate_limit(client_ip):
+        raise HTTPException(
+            status_code=429, 
+            detail="Too many requests. Please wait a moment."
+        )
+    
     message = payload.message.strip()
     session_id = payload.session_id.strip()
     if not message:
